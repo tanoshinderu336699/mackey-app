@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>マッキーのJourney Message ✨</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 50%, #ffedd5 100%);
+    min-height: 100vh;
+  }
+  .font-serif-jp { font-family: 'Noto Serif JP', serif; }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
+  }
+  .animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
+
+  @keyframes sparkle {
+    0%, 100% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+  .animate-sparkle { animation: sparkle 2s ease-in-out infinite; }
+
+  @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .animate-spin-slow { animation: spin-slow 60s linear infinite; }
+
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+  .animate-pulse-soft { animation: pulse-soft 3s ease-in-out infinite; }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  .shimmer-text {
+    background: linear-gradient(90deg, #fb923c, #fbbf24, #f97316, #fbbf24, #fb923c);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 4s linear infinite;
+  }
+
+  @keyframes bounce-soft {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .animate-bounce-soft { animation: bounce-soft 2s ease-in-out infinite; }
+
+  .sparkle-bg::before, .sparkle-bg::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,237,153,0.9), transparent);
+    pointer-events: none;
+  }
+  .sparkle-bg::before {
+    top: 10%; left: 15%; width: 80px; height: 80px;
+    animation: sparkle 3s ease-in-out infinite;
+  }
+  .sparkle-bg::after {
+    bottom: 15%; right: 10%; width: 60px; height: 60px;
+    animation: sparkle 4s ease-in-out infinite 1s;
+  }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #fff7ed; }
+  ::-webkit-scrollbar-thumb { background: #fb923c; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useRef, useEffect } = React;
+
+const Icon = ({ children, size = 24, className = '', fill = 'none', strokeWidth = 2, ...p }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"
+    fill={fill} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className} {...p}>{children}</svg>
+);
+const Compass = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></Icon>;
+const Play = (p) => <Icon {...p}><polygon points="6 3 20 12 6 21 6 3"/></Icon>;
+const Pause = (p) => <Icon {...p}><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></Icon>;
+const Upload = (p) => <Icon {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></Icon>;
+const Settings = (p) => <Icon {...p}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></Icon>;
+const LogOut = (p) => <Icon {...p}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></Icon>;
+const Calendar = (p) => <Icon {...p}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></Icon>;
+const Star = (p) => <Icon {...p}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></Icon>;
+const KeyRound = (p) => <Icon {...p}><path d="M2 18v3c0 .6.4 1 1 1h4v-3h3v-3h2l1.4-1.4a6.5 6.5 0 1 0-4-4Z"/><circle cx="16.5" cy="7.5" r=".5"/></Icon>;
+const Music = (p) => <Icon {...p}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></Icon>;
+const LinkIcon = (p) => <Icon {...p}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></Icon>;
+const ChevronRight = (p) => <Icon {...p}><polyline points="9 18 15 12 9 6"/></Icon>;
+const X = (p) => <Icon {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></Icon>;
+const Sparkles = (p) => <Icon {...p}><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M19 13l.8 2.4L22 16l-2.2.6L19 19l-.8-2.4L16 16l2.2-.6z" opacity="0.6"/><path d="M5 13l.8 2.4L8 16l-2.2.6L5 19l-.8-2.4L2 16l2.2-.6z" opacity="0.4"/></Icon>;
+const Sun = (p) => <Icon {...p}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></Icon>;
+const Moon = (p) => <Icon {...p}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></Icon>;
+const Heart = (p) => <Icon {...p}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></Icon>;
+const Info = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></Icon>;
+const Plane = (p) => <Icon {...p}><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></Icon>;
+const Edit = (p) => <Icon {...p}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></Icon>;
+const Save = (p) => <Icon {...p}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></Icon>;
+
+// ==========================================
+// デフォルトプロフィール
+// ==========================================
+const DEFAULT_PROFILE = {
+  name: 'マッキー',
+  title: '旅するサイキックコーチ ✈️',
+  tagline: '人生を旅するように生きるあなたへ 🗺️',
+  bio1: '西洋占星術・四柱推命・算命学・数秘術・タロットを統合し、\n「旅するように人生を生きる人」へ\n毎日のメッセージを届けています ✨',
+  bio2: '神社、森、海。\n世界中を巡りながら、\nその土地のエネルギーと出会い、\nあなたの今日に必要な「気づき」を持って帰ってくる、\nそんな存在です 🌍',
+  message: '人生は旅です。\n同じ景色をなぞるのではなく、\nあなただけのコンパスで歩いていい。',
+  message2: '迷った日も、\n晴れない日も、\n星はちゃんと味方しています ⭐',
+  photo1Label: '⛩️ 神社',
+  photo2Label: '🌊 海辺',
+  appTitle: 'マッキーの',
+  appSubtitle: 'Journey Message ✨',
+};
+
+const getProfile = () => {
+  try {
+    const stored = localStorage.getItem('mackey-profile');
+    if (stored) return { ...DEFAULT_PROFILE, ...JSON.parse(stored) };
+  } catch(e) {}
+  return DEFAULT_PROFILE;
+};
+
+const saveProfile = (profile) => {
+  localStorage.setItem('mackey-profile', JSON.stringify(profile));
+};
+
+// ==========================================
+// 計算ロジック
+// ==========================================
+const reduceToSingle = (n) => {
+  while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
+    n = String(n).split('').reduce((a, b) => a + parseInt(b), 0);
+  }
+  return n;
+};
+const sumDigits = (n) => String(n).split('').reduce((a, b) => a + parseInt(b), 0);
+
+const calculateNumerology = (year, month, day, today) => {
+  const lifePath = reduceToSingle(sumDigits(year) + sumDigits(month) + sumDigits(day));
+  const personalYear = reduceToSingle(sumDigits(today.getFullYear()) + parseInt(month) + parseInt(day));
+  const personalDay = reduceToSingle(sumDigits(today.getFullYear()) + (today.getMonth() + 1) + today.getDate() + parseInt(month) + parseInt(day));
+  return { lifePath, personalYear, personalDay };
+};
+
+const numerologyMeanings = {
+  1: { keyword: 'リーダー・始まり', desc: '自分の意志で道を切り拓く力' },
+  2: { keyword: '調和・協力', desc: '人と繋がりバランスを取る力' },
+  3: { keyword: '創造・表現', desc: '無邪気に楽しさを生み出す力' },
+  4: { keyword: '安定・基盤', desc: 'コツコツと積み上げる力' },
+  5: { keyword: '自由・変化', desc: '冒険して新しい風を運ぶ力' },
+  6: { keyword: '愛・調整', desc: '愛で包み調和を作る力' },
+  7: { keyword: '探求・直感', desc: '深く真理を見つめる力' },
+  8: { keyword: '豊かさ・実現', desc: '現実を動かし結果を出す力' },
+  9: { keyword: '完成・奉仕', desc: '全てを統合し愛を循環させる力' },
+  11: { keyword: '直感・霊性', desc: 'スピリチュアルな道しるべ✨' },
+  22: { keyword: '具現化マスター', desc: '夢を現実化する大きな力' },
+  33: { keyword: '無条件の愛', desc: '愛で世界を満たす使命' }
+};
+
+const heavenlyStems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+const earthlyBranches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+const stemElements = { '甲': '陽の木', '乙': '陰の木', '丙': '陽の火', '丁': '陰の火', '戊': '陽の土', '己': '陰の土', '庚': '陽の金', '辛': '陰の金', '壬': '陽の水', '癸': '陰の水' };
+
+const calculateDayPillar = (year, month, day) => {
+  const ref = new Date(1900, 0, 1);
+  const target = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+  const dayDiff = Math.floor((target - ref) / 86400000);
+  const idx = ((dayDiff + 10) % 60 + 60) % 60;
+  return { stem: heavenlyStems[idx % 10], branch: earthlyBranches[idx % 12], idx };
+};
+
+const calculateYearPillar = (year, month, day) => {
+  const adjustedYear = (parseInt(month) < 2 || (parseInt(month) === 2 && parseInt(day) < 4)) ? parseInt(year) - 1 : parseInt(year);
+  const yearDiff = ((adjustedYear - 1984) % 60 + 60) % 60;
+  return { stem: heavenlyStems[yearDiff % 10], branch: earthlyBranches[yearDiff % 12], idx: yearDiff };
+};
+
+const sanmeigakuStars = {
+  '貫索星': { tsuhensei: '比肩', meaning: '一本気・マイペース・自分の道を貫く独立の星', element: '🌳' },
+  '石門星': { tsuhensei: '劫財', meaning: '社交性・人脈・場の中心になるリーダーの星', element: '🌿' },
+  '鳳閣星': { tsuhensei: '食神', meaning: '楽天家・自然体・遊び心と健康の星', element: '🔥' },
+  '調舒星': { tsuhensei: '傷官', meaning: '繊細・芸術家肌・美意識と感受性の星', element: '🕯️' },
+  '禄存星': { tsuhensei: '偏財', meaning: '愛情豊か・奉仕の心・受け取る豊かさの星', element: '⛰️' },
+  '司禄星': { tsuhensei: '正財', meaning: '堅実・コツコツ・蓄積と継続の星', element: '🌾' },
+  '車騎星': { tsuhensei: '偏官', meaning: '行動力・スピード・正義感と前進の星', element: '⚔️' },
+  '牽牛星': { tsuhensei: '正官', meaning: 'プライド・名誉・組織で輝く社会的地位の星', element: '💎' },
+  '龍高星': { tsuhensei: '偏印', meaning: '探究心・冒険・異郷を好む独創性の星', element: '🌊' },
+  '玉堂星': { tsuhensei: '印綬', meaning: '学者肌・伝統・深い知恵と教える星', element: '💧' }
+};
+
+const stemMeta = {
+  '甲': { element: '木', yang: true },  '乙': { element: '木', yang: false },
+  '丙': { element: '火', yang: true },  '丁': { element: '火', yang: false },
+  '戊': { element: '土', yang: true },  '己': { element: '土', yang: false },
+  '庚': { element: '金', yang: true },  '辛': { element: '金', yang: false },
+  '壬': { element: '水', yang: true },  '癸': { element: '水', yang: false }
+};
+
+const branchHiddenStem = {
+  '子': '癸', '丑': '己', '寅': '甲', '卯': '乙',
+  '辰': '戊', '巳': '丙', '午': '丁', '未': '己',
+  '申': '庚', '酉': '辛', '戌': '戊', '亥': '壬'
+};
+
+const elementRelation = (from, to) => {
+  if (from === to) return 'same';
+  const productive = { '木': '火', '火': '土', '土': '金', '金': '水', '水': '木' };
+  if (productive[from] === to) return 'produces';
+  if (productive[to] === from) return 'producedBy';
+  const destructive = { '木': '土', '土': '水', '水': '火', '火': '金', '金': '木' };
+  if (destructive[from] === to) return 'destroys';
+  if (destructive[to] === from) return 'destroyedBy';
+  return 'unknown';
+};
+
+const calculateMonthPillar = (year, month, day) => {
+  const m = parseInt(month);
+  const d = parseInt(day);
+  const setsuMonth = d >= 5 ? m : (m === 1 ? 12 : m - 1);
+  const branchByMonth = {
+    2: '寅', 3: '卯', 4: '辰', 5: '巳', 6: '午', 7: '未',
+    8: '申', 9: '酉', 10: '戌', 11: '亥', 12: '子', 1: '丑'
+  };
+  const monthBranch = branchByMonth[setsuMonth];
+  const yearPillar = calculateYearPillar(year, month, day);
+  const yearStemIdx = heavenlyStems.indexOf(yearPillar.stem);
+  const tigerStemMap = [2, 4, 6, 8, 0, 2, 4, 6, 8, 0];
+  const tigerStemIdx = tigerStemMap[yearStemIdx];
+  const offset = setsuMonth >= 2 ? setsuMonth - 2 : setsuMonth + 10;
+  const monthStemIdx = (tigerStemIdx + offset) % 10;
+  return { stem: heavenlyStems[monthStemIdx], branch: monthBranch };
+};
+
+const calculateChuushinsei = (dayStem, monthBranch) => {
+  const targetStem = branchHiddenStem[monthBranch];
+  if (!targetStem) return '貫索星';
+  const dayMeta = stemMeta[dayStem];
+  const monMeta = stemMeta[targetStem];
+  const sameYang = dayMeta.yang === monMeta.yang;
+  const rel = elementRelation(dayMeta.element, monMeta.element);
+  if (rel === 'same')        return sameYang ? '貫索星' : '石門星';
+  if (rel === 'produces')    return sameYang ? '鳳閣星' : '調舒星';
+  if (rel === 'destroys')    return sameYang ? '禄存星' : '司禄星';
+  if (rel === 'destroyedBy') return sameYang ? '車騎星' : '牽牛星';
+  if (rel === 'producedBy')  return sameYang ? '龍高星' : '玉堂星';
+  return '貫索星';
+};
+
+const calculateSunSign = (month, day) => {
+  const m = parseInt(month), d = parseInt(day);
+  const signs = [
+    { name: '山羊座', emoji: '♑', start: [12, 22], end: [1, 19] },
+    { name: '水瓶座', emoji: '♒', start: [1, 20], end: [2, 18] },
+    { name: '魚座', emoji: '♓', start: [2, 19], end: [3, 20] },
+    { name: '牡羊座', emoji: '♈', start: [3, 21], end: [4, 19] },
+    { name: '牡牛座', emoji: '♉', start: [4, 20], end: [5, 20] },
+    { name: '双子座', emoji: '♊', start: [5, 21], end: [6, 21] },
+    { name: '蟹座', emoji: '♋', start: [6, 22], end: [7, 22] },
+    { name: '獅子座', emoji: '♌', start: [7, 23], end: [8, 22] },
+    { name: '乙女座', emoji: '♍', start: [8, 23], end: [9, 22] },
+    { name: '天秤座', emoji: '♎', start: [9, 23], end: [10, 23] },
+    { name: '蠍座', emoji: '♏', start: [10, 24], end: [11, 22] },
+    { name: '射手座', emoji: '♐', start: [11, 23], end: [12, 21] }
+  ];
+  if (m === 12 && d >= 22) return signs[0];
+  if (m === 1 && d <= 19) return signs[0];
+  for (let s of signs.slice(1)) {
+    if (m === s.start[0] && d >= s.start[1]) return s;
+    if (m === s.end[0] && d <= s.end[1]) return s;
+  }
+  return signs[0];
+};
+
+const calculateMoonSign = (year, month, day, hour, minute) => {
+  const Y = parseInt(year), M = parseInt(month), D = parseInt(day);
+  const isUnknownTime = hour === 'unknown' || hour === '';
+  const H = isUnknownTime ? 12 : parseInt(hour);
+  const Mi = isUnknownTime ? 0 : parseInt(minute);
+  let y = Y, m = M;
+  if (m <= 2) { y -= 1; m += 12; }
+  const A = Math.floor(y / 100);
+  const B = 2 - A + Math.floor(A / 4);
+  const JD = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + D + B - 1524.5 + (H + Mi/60 - 9) / 24;
+  const T = (JD - 2451545.0) / 36525;
+  let L = 218.3164477 + 481267.88123421 * T;
+  const Mm = 134.9633964 + 477198.8675055 * T;
+  const Ms = 357.5291092 + 35999.0502909 * T;
+  const Dm = 297.8501921 + 445267.1114034 * T;
+  const F = 93.2720950 + 483202.0175233 * T;
+  const rad = Math.PI / 180;
+  L += 6.289 * Math.sin(Mm * rad);
+  L += -1.274 * Math.sin((Mm - 2*Dm) * rad);
+  L += 0.658 * Math.sin(2*Dm * rad);
+  L += 0.214 * Math.sin(2*Mm * rad);
+  L += -0.186 * Math.sin(Ms * rad);
+  L += -0.114 * Math.sin(2*F * rad);
+  L = ((L % 360) + 360) % 360;
+  const signIndex = Math.floor(L / 30);
+  const signs = [
+    { name: '牡羊座', emoji: '♈' }, { name: '牡牛座', emoji: '♉' }, { name: '双子座', emoji: '♊' },
+    { name: '蟹座', emoji: '♋' }, { name: '獅子座', emoji: '♌' }, { name: '乙女座', emoji: '♍' },
+    { name: '天秤座', emoji: '♎' }, { name: '蠍座', emoji: '♏' }, { name: '射手座', emoji: '♐' },
+    { name: '山羊座', emoji: '♑' }, { name: '水瓶座', emoji: '♒' }, { name: '魚座', emoji: '♓' }
+  ];
+  return { ...signs[signIndex], approximate: isUnknownTime };
+};
+
+// ==========================================
+// マッキーから一言
+// ==========================================
+const mackeyHitokoto = [
+  { title: '🌍 旅は最高の先生', body: '本で学ぶことより、自分の足で歩いた一歩のほうが、ずっと深く心に残ります。今日、いつもと違う道を選んでみて。それも立派な旅です。' },
+  { title: '✈️ 風になる勇気', body: '吉方位旅行のいちばんの効果は「いつもの自分から離れる」こと。慣れた環境から一度抜け出すと、人生の輪郭がくっきり見えてきます。' },
+  { title: '🌅 朝の光に背中を', body: '新しい場所で迎える朝は、一日の何倍ものエネルギーを運んできます。窓を開けて、光を浴びるところから旅が始まります。' },
+  { title: '🗺️ 地図にない発見', body: 'ガイドブックに載っていない小道、地元の人だけが知るカフェ。それこそが旅の醍醐味。計画は半分、残りは余白でいい。' },
+  { title: '🌸 出会いは縁の手紙', body: '旅先で出会う人は、宇宙からのメッセンジャー。「なぜ今この人に？」と問いかけると、人生のヒントが見えてきます。' },
+  { title: '🏔️ 高い場所のエネルギー', body: '山や展望台に登ると、悩みが小さく見える。それは物理的な高さが、心の視点も引き上げてくれるからです。' },
+  { title: '⛩️ 神社で深呼吸', body: '神社に行ったら、まず深呼吸。ご祈願の前に、その土地の空気を体に取り込むのが大切です。' },
+  { title: '🌊 海と話す日', body: '海の音は、どんな心配ごとも溶かします。波打ち際に立って、ただ波を見るだけでいい。それが最高のリセット。' },
+  { title: '🌿 森で電源OFF', body: '森に入ったら、スマホは鞄の中へ。木々の呼吸と、自分の呼吸が同じになる感覚を味わってみて。' },
+  { title: '☕ 一杯のコーヒーから', body: '旅の朝は、地元のカフェで一杯。その町の空気をゆっくり味わう時間が、その後の一日を豊かに彩ります。' },
+  { title: '🌙 夜の散歩', body: '旅先での夜の散歩には、特別な魔法があります。昼とは違う街の表情に、新しい自分が出会えるかも。' },
+  { title: '📷 心のシャッター', body: '写真を撮らない時間を作ってみて。目で見て、肌で感じて、心で記憶する。デジタルに残さないからこそ、一生忘れない。' },
+  { title: '🍙 食は土地の魂', body: 'その土地で採れたものを、その土地で食べる。これが最高のエネルギー取り込みです。地元の食堂を選んでみて。' },
+  { title: '🎒 荷物は少なめに', body: '旅の達人は荷物が少ない。本当に必要なものを見極める力は、人生でも大事な選別眼になります。' },
+  { title: '🛤️ 寄り道のすすめ', body: '目的地に最短で行くより、寄り道をする旅のほうが記憶に残る。人生も同じ。回り道に宝物が落ちています。' },
+  { title: '🌟 一人旅の自由', body: '誰とも合わせなくていい時間は、自分との対話の時間。一人旅は、本当の自分に再会する旅でもあります。' },
+  { title: '🎋 願いを書く', body: '旅先で短冊や絵馬に願いを書く時、いちばん深い本音が出てきます。それが本当に欲しいもの。' },
+  { title: '🌸 桜守の心', body: 'その土地を愛し、守ってきた人の話を聞く時間を作って。土地の本当の魅力が見えてきます。' },
+  { title: '🌅 夜明け前の静けさ', body: '世界が目覚める前の30分。この時間に外を歩くと、エネルギーを一番きれいな状態で受け取れます。' },
+  { title: '💫 偶然の再会', body: '旅先で「あれ、こんなところで？」という偶然の再会は、宇宙からのギフト。意味を探さずに受け取って。' },
+  { title: '🌊 流れに乗って', body: '川の流れ、海の波、人生の流れ。逆らうより、流れに身を任せる時のほうが、ふしぎと運が開けます。' },
+  { title: '🌟 旅は人生の縮図', body: '一回の旅には、人生の喜怒哀楽が全部詰まっている。だから旅をする人は、人生の達人になりやすい。' },
+  { title: '🎁 旅は自分への贈り物', body: '誰かのためじゃなく、自分のための時間を確保すること。それが旅。だから罪悪感なんていらない。' },
+  { title: '🌈 雨上がりの虹', body: '雨上がりに虹が出たら、それは祝福のサイン。今、あなたが進んでいる方向は正解という宇宙からのメッセージ。' },
+  { title: '🌙 月夜の散歩', body: '満月の夜の散歩は、特別な瞑想。月光が照らす自分の影を見つめて、いま在ることを実感する時間。' },
+  { title: '✨ 旅は奇跡の連続', body: 'よく考えると、無事に旅できることそのものが奇跡。健康・時間・お金・出会い、すべてが揃わないとできない、貴重な時間。' },
+  { title: '🧭 コンパスは心', body: 'どの方向に行くか迷ったら、心が温かくなる方を選んで。それがあなたの本当の道です。' },
+  { title: '🌻 名所より路地裏', body: '有名な観光地より、地元の人が通う路地裏のほうが、本当の街の魂が見えます。勇気を出して、人通りの少ない道へ。' },
+  { title: '🏠 帰る場所があるから', body: '旅の喜びは、帰る場所があるからこそ。家を大切にする人は、旅もまた深く味わえます。' },
+  { title: '🌳 樹齢千年に学ぶ', body: '巨木の前に立つと、自分のせかせかした生き方が恥ずかしくなる。「ゆっくりでいい」と教わる瞬間。' },
+];
+
+const getMackeyHitokoto = (date) => {
+  const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
+  const seed = date.getFullYear() * 1000 + dayOfYear;
+  return mackeyHitokoto[seed % mackeyHitokoto.length];
+};
+
+// ==========================================
+// タロットカードSVG
+// ==========================================
+const TarotCardSVG = ({ card, size = 200 }) => {
+  const renderArt = () => {
+    switch (card.id) {
+      case 0: return (<><circle cx="50" cy="40" r="8" fill="#fde68a"/><path d="M 42 45 Q 50 70 58 45" fill="#fb923c"/><line x1="50" y1="70" x2="50" y2="100" stroke="#9a3412" strokeWidth="2"/><circle cx="50" cy="40" r="8" fill="none" stroke="#fbbf24" strokeWidth="1.5"/><path d="M 35 110 Q 50 95 65 110" fill="#fde68a"/></>);
+      case 1: return (<><circle cx="50" cy="35" r="7" fill="#fde68a"/><path d="M 42 42 L 58 42 L 60 80 L 40 80 Z" fill="#fb923c"/><text x="50" y="30" fill="#fbbf24" fontSize="14" textAnchor="middle">∞</text><line x1="35" y1="55" x2="42" y2="50" stroke="#fef3c7" strokeWidth="2"/></>);
+      case 2: return (<><rect x="35" y="40" width="30" height="60" fill="#7dd3fc" rx="3"/><circle cx="50" cy="35" r="7" fill="#fde68a"/><circle cx="50" cy="55" r="4" fill="#fef3c7"/><text x="50" y="58" fill="#0c4a6e" fontSize="6" textAnchor="middle">☽</text></>);
+      case 3: return (<><circle cx="50" cy="35" r="8" fill="#fde68a"/><path d="M 35 45 Q 50 90 65 45 Z" fill="#f472b6"/><circle cx="50" cy="32" r="3" fill="#fbbf24"/><path d="M 30 90 Q 50 85 70 90" stroke="#84cc16" strokeWidth="2" fill="none"/></>);
+      case 4: return (<><circle cx="50" cy="35" r="8" fill="#fde68a"/><rect x="40" y="42" width="20" height="40" fill="#dc2626"/><rect x="35" y="42" width="30" height="6" fill="#fbbf24"/><path d="M 30 95 L 70 95" stroke="#fbbf24" strokeWidth="3"/></>);
+      case 5: return (<><circle cx="35" cy="45" r="6" fill="#fde68a"/><circle cx="65" cy="45" r="6" fill="#fde68a"/><path d="M 50 50 L 50 75" stroke="#f472b6" strokeWidth="2"/><path d="M 45 60 Q 50 50 55 60 Q 50 70 45 60 Z" fill="#ef4444"/></>);
+      case 6: return (<><rect x="30" y="55" width="40" height="20" fill="#475569" rx="2"/><circle cx="38" cy="80" r="6" fill="#1e293b"/><circle cx="62" cy="80" r="6" fill="#1e293b"/><circle cx="50" cy="40" r="8" fill="#fde68a"/><path d="M 35 50 L 65 50" stroke="#fbbf24" strokeWidth="2"/></>);
+      case 7: return (<><circle cx="50" cy="60" r="25" fill="none" stroke="#fbbf24" strokeWidth="3"/><line x1="50" y1="35" x2="50" y2="85" stroke="#fbbf24" strokeWidth="2"/><line x1="25" y1="60" x2="75" y2="60" stroke="#fbbf24" strokeWidth="2"/><circle cx="50" cy="60" r="5" fill="#f97316"/><text x="50" y="20" fill="#fbbf24" fontSize="10" textAnchor="middle">⚡</text></>);
+      case 8: return (<><circle cx="50" cy="35" r="12" fill="#fef3c7"/><text x="50" y="42" fill="#fbbf24" fontSize="20" textAnchor="middle">★</text><circle cx="30" cy="55" r="3" fill="#fbbf24"/><circle cx="70" cy="55" r="3" fill="#fbbf24"/><path d="M 30 80 Q 50 70 70 80" fill="#7dd3fc"/></>);
+      case 9: return (<><circle cx="50" cy="50" r="20" fill="#fbbf24"/><line x1="50" y1="20" x2="50" y2="25" stroke="#fbbf24" strokeWidth="3"/><line x1="50" y1="75" x2="50" y2="80" stroke="#fbbf24" strokeWidth="3"/><line x1="20" y1="50" x2="25" y2="50" stroke="#fbbf24" strokeWidth="3"/><line x1="75" y1="50" x2="80" y2="50" stroke="#fbbf24" strokeWidth="3"/><text x="50" y="56" fill="#9a3412" fontSize="14" textAnchor="middle">☺</text></>);
+      case 10: return (<><circle cx="50" cy="55" r="22" fill="none" stroke="#84cc16" strokeWidth="3"/><circle cx="50" cy="55" r="22" fill="#bef264" opacity="0.3"/><circle cx="50" cy="40" r="6" fill="#fde68a"/><text x="50" y="60" fill="#84cc16" fontSize="14" textAnchor="middle">∞</text><text x="20" y="30" fill="#fbbf24" fontSize="10">♔</text><text x="75" y="30" fill="#fbbf24" fontSize="10">♕</text></>);
+      default: return null;
+    }
+  };
+  return (
+    <div className="relative inline-block" style={{ width: size, height: size * 1.5 }}>
+      <svg viewBox="0 0 100 150" className="w-full h-full drop-shadow-2xl">
+        <defs><linearGradient id={`bg-${card.id}`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fff7ed"/><stop offset="100%" stopColor="#fed7aa"/></linearGradient></defs>
+        <rect x="2" y="2" width="96" height="146" rx="6" fill={`url(#bg-${card.id})`} stroke="#fbbf24" strokeWidth="1.5"/>
+        <rect x="6" y="6" width="88" height="138" rx="4" fill="none" stroke="#fb923c" strokeWidth="0.5" strokeDasharray="2,2"/>
+        <text x="50" y="18" fill="#9a3412" fontSize="6" textAnchor="middle" fontWeight="bold">{card.romaji}</text>
+        <g transform="translate(0, 15)">{renderArt()}</g>
+        <text x="50" y="135" fill="#9a3412" fontSize="8" textAnchor="middle" fontWeight="bold">{card.name}</text>
+        <text x="10" y="148" fill="#fbbf24" fontSize="6" fontWeight="bold">{card.id}</text>
+        <text x="90" y="14" fill="#fbbf24" fontSize="6" textAnchor="end" fontWeight="bold">{card.id}</text>
+      </svg>
+    </div>
+  );
+};
+
+// ==========================================
+// テキスト整形
+// ==========================================
+const FormattedText = ({ text, className = '' }) => {
+  if (!text) return null;
+  const paragraphs = text.split(/\n\s*\n/);
+  return (
+    <div className={`space-y-6 ${className}`}>
+      {paragraphs.map((paragraph, idx) => (
+        <div key={idx} className="text-[15px] leading-[2.0] text-stone-700">
+          {paragraph.split('\n').map((line, lIdx) => (
+            <React.Fragment key={lIdx}>
+              {line}
+              {lIdx !== paragraph.split('\n').length - 1 && <br />}
+            </React.Fragment>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ==========================================
+// マッキー画像
+// ==========================================
+const MackeyImage = ({ which = '1', className = '', alt = 'マッキー' }) => {
+  const [error, setError] = useState(false);
+  const [storedImage, setStoredImage] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.__embeddedMackeyImages && window.__embeddedMackeyImages[which]) {
+      setStoredImage(window.__embeddedMackeyImages[which]);
+      return;
+    }
+    const stored = localStorage.getItem(`mackey-image-${which}`);
+    if (stored) setStoredImage(stored);
+  }, [which]);
+
+  const fallbackSvg = (
+    <div className={`bg-gradient-to-br from-orange-200 via-amber-200 to-pink-200 flex items-center justify-center relative overflow-hidden ${className}`}>
+      <svg viewBox="0 0 100 100" className="w-3/4 h-3/4">
+        <circle cx="50" cy="50" r="45" fill="url(#mackeyGrad)" opacity="0.4"/>
+        <defs><linearGradient id="mackeyGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fde68a"/><stop offset="100%" stopColor="#fb923c"/></linearGradient></defs>
+        <ellipse cx="50" cy="38" rx="22" ry="18" fill="#3f2716"/>
+        <path d="M 28 40 Q 28 55 35 65 L 38 50 Z" fill="#3f2716"/>
+        <path d="M 72 40 Q 72 55 65 65 L 62 50 Z" fill="#3f2716"/>
+        <ellipse cx="50" cy="50" rx="16" ry="20" fill="#fde0c8"/>
+        <path d="M 41 47 Q 44 45 47 47" stroke="#3f2716" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+        <path d="M 53 47 Q 56 45 59 47" stroke="#3f2716" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+        <path d="M 44 56 Q 50 62 56 56" stroke="#dc2626" strokeWidth="1.5" fill="#fca5a5" strokeLinecap="round"/>
+        <path d="M 30 75 Q 50 70 70 75 L 75 100 L 25 100 Z" fill="#fef3c7"/>
+        <text x="20" y="20" fill="#fbbf24" fontSize="8">✨</text>
+        <text x="78" y="22" fill="#fb923c" fontSize="6">✨</text>
+        <text x="15" y="80" fill="#ec4899" fontSize="5">✨</text>
+      </svg>
+    </div>
+  );
+
+  if (storedImage && !error) {
+    return <img src={storedImage} alt={alt} className={className} onError={() => setError(true)}/>;
+  }
+  if (!error) {
+    return <img src={`./images/mackey-${which}.jpg`} alt={alt} onError={() => setError(true)} className={className}/>;
+  }
+  return fallbackSvg;
+};
+
+// ==========================================
+// メインアプリ
+// ==========================================
+function App() {
+  const [screen, setScreen] = useState('login');
+  const [password, setPassword] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [setupImagesUploaded, setSetupImagesUploaded] = useState({
+    '1': typeof localStorage !== 'undefined' && !!localStorage.getItem('mackey-image-1'),
+    '2': typeof localStorage !== 'undefined' && !!localStorage.getItem('mackey-image-2'),
+    '3': typeof localStorage !== 'undefined' && !!localStorage.getItem('mackey-image-3')
+  });
+
+  // プロフィール編集用
+  const [profile, setProfile] = useState(getProfile);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profileDraft, setProfileDraft] = useState(getProfile);
+  const [profileSaved, setProfileSaved] = useState(false);
+
+  const [birthYear, setBirthYear] = useState('');
+  const [birthMonth, setBirthMonth] = useState('');
+  const [birthDay, setBirthDay] = useState('');
+  const [birthTimeHour, setBirthTimeHour] = useState('');
+  const [birthTimeMinute, setBirthTimeMinute] = useState('');
+  const [birthPlace, setBirthPlace] = useState('');
+
+  const [qEnergy, setQEnergy] = useState('');
+  const [qPath, setQPath] = useState('');
+  const [qMind, setQMind] = useState('');
+
+  const [readingData, setReadingData] = useState(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [apiError, setApiError] = useState(false);
+
+  const [detailModal, setDetailModal] = useState(null);
+  const [detailContent, setDetailContent] = useState('');
+  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+
+  const [apiKeyInput, setApiKeyInput] = useState('');
+  const [audioUrl, setAudioUrl] = useState('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+  const [audioTitle, setAudioTitle] = useState('今週のマッキーからのメッセージ');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [videoUrl, setVideoUrl] = useState('');
+  const [videoTitle, setVideoTitle] = useState('今週のマッキー動画メッセージ');
+
+  const audioRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  const CORRECT_PASSWORD = 'mackey2026';
+  const ADMIN_PASSWORD = 'admin-mackey';
+
+  useEffect(() => {
+    const k = localStorage.getItem('gemini_api_key') || '';
+    setApiKeyInput(k);
+  }, []);
+
+  // プロフィール保存
+  const handleSaveProfile = () => {
+    saveProfile(profileDraft);
+    setProfile(profileDraft);
+    setEditingProfile(false);
+    setProfileSaved(true);
+    setTimeout(() => setProfileSaved(false), 3000);
+  };
+
+  const handleResetProfile = () => {
+    if (confirm('プロフィールをデフォルトに戻しますか？')) {
+      localStorage.removeItem('mackey-profile');
+      setProfile(DEFAULT_PROFILE);
+      setProfileDraft(DEFAULT_PROFILE);
+    }
+  };
+
+  const majorArcana = [
+    { id: 0, name: '愚者', romaji: 'THE FOOL', meaning: '自由・始まり・直感のままに' },
+    { id: 1, name: '魔術師', romaji: 'THE MAGICIAN', meaning: '創造力・必要なものは持っている' },
+    { id: 2, name: '女教皇', romaji: 'THE HIGH PRIESTESS', meaning: '直感・静寂・内なる答え' },
+    { id: 3, name: '女帝', romaji: 'THE EMPRESS', meaning: '豊かさ・受け取る・愛を味わう' },
+    { id: 4, name: '皇帝', romaji: 'THE EMPEROR', meaning: '安定・基盤・人生の主導権' },
+    { id: 5, name: '恋人', romaji: 'THE LOVERS', meaning: '選択・ワクワク・調和' },
+    { id: 6, name: '戦車', romaji: 'THE CHARIOT', meaning: '前進・勢い・一直線' },
+    { id: 7, name: '運命の輪', romaji: 'WHEEL OF FORTUNE', meaning: '変化・流れ・シンクロ' },
+    { id: 8, name: '星', romaji: 'THE STAR', meaning: '希望・ひらめき・未来の道しるべ' },
+    { id: 9, name: '太陽', romaji: 'THE SUN', meaning: '成功・喜び・無邪気に楽しむ' },
+    { id: 10, name: '世界', romaji: 'THE WORLD', meaning: '完成・統合・次への準備' }
+  ];
+
+  const energyOptions = { 'full': '100%！満タンで動きたい！', 'half': '50%くらい。まあまあ普通。', 'low': '20%以下。省エネモードです…' };
+  const pathOptions = { 'wide': '陽の当たる広くてまっすぐな道', 'narrow': '木漏れ日が差す静かな小道', 'sea': '波の音が聞こえる海への道' };
+  const mindOptions = { 'freedom': '何にも縛られない「自由」', 'connection': 'わかりあえる「繋がり」', 'fun': '童心に帰るような「ワクワク」' };
+
+  const prefectures = ['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県','日本国外','わからない'];
+
+  const getDaysInMonth = (year, month) => !year || !month ? 31 : new Date(year, month, 0).getDate();
+  const daysInMonth = getDaysInMonth(birthYear, birthMonth);
+
+  useEffect(() => {
+    if (birthDay && parseInt(birthDay) > daysInMonth) setBirthDay('');
+  }, [birthYear, birthMonth, daysInMonth, birthDay]);
+
+  const handleLogin = (e) => {
+    e?.preventDefault();
+    if (password === CORRECT_PASSWORD) { setScreen('input'); setPasswordError(''); }
+    else setPasswordError('合言葉が違うみたい…もう一度試してみてね🌊');
+  };
+  const handleAdminLogin = (e) => {
+    e?.preventDefault();
+    if (adminPassword === ADMIN_PASSWORD) { setScreen('adminPanel'); setPasswordError(''); }
+    else setPasswordError('管理者パスワードが違います');
+  };
+  const handleLogout = () => {
+    setScreen('login'); setPassword(''); setAdminPassword('');
+    setBirthYear(''); setBirthMonth(''); setBirthDay('');
+    setBirthTimeHour(''); setBirthTimeMinute(''); setBirthPlace('');
+    setQEnergy(''); setQPath(''); setQMind('');
+    setReadingData(null); setDetailModal(null);
+    if (audioRef.current) { audioRef.current.pause(); setIsPlaying(false); }
+  };
+
+  const isInputValid = birthYear && birthMonth && birthDay && birthTimeHour && (birthTimeHour === 'unknown' || birthTimeMinute) && birthPlace;
+  const handleProceedToQuestions = (e) => { e.preventDefault(); if (isInputValid) setScreen('questions'); };
+
+  // ==========================================
+  // メインリーディング生成
+  // ==========================================
+  const generateReading = async () => {
+    setIsCalculating(true);
+    setApiError(false);
+    const today = new Date();
+    const seed = parseInt(birthYear) + parseInt(birthMonth) + parseInt(birthDay) + today.getDate() + today.getMonth();
+    const drawnCard = majorArcana[seed % majorArcana.length];
+
+    const numerology = calculateNumerology(birthYear, birthMonth, birthDay, today);
+    const dayPillar = calculateDayPillar(birthYear, birthMonth, birthDay);
+    const yearPillar = calculateYearPillar(birthYear, birthMonth, birthDay);
+    const todayDayPillar = calculateDayPillar(today.getFullYear(), today.getMonth() + 1, today.getDate());
+    const sunSign = calculateSunSign(birthMonth, birthDay);
+    const moonSign = calculateMoonSign(birthYear, birthMonth, birthDay, birthTimeHour, birthTimeMinute);
+    const monthPillar = calculateMonthPillar(birthYear, birthMonth, birthDay);
+    const chuushinseiName = calculateChuushinsei(dayPillar.stem, monthPillar.branch);
+    const mainStar = { name: chuushinseiName, ...sanmeigakuStars[chuushinseiName] };
+
+    const calculatedData = {
+      date: today.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'short' }),
+      card: drawnCard, numerology, dayPillar, yearPillar, monthPillar,
+      todayDayPillar, sunSign, moonSign, mainStar
+    };
+
+    const systemInstruction = `あなたは「旅するサイキックコーチ・${profile.name}」です。複数の占術データを統合し、温かくて旅人のようなトーンで今日のメッセージを伝えてください。
+
+【📋 アウトプット構成】
+1️⃣ 今日のエネルギー総括（必ず300文字前後で詳しく）
+2️⃣ 統合リーディング 🔮（必ず400〜500文字で詳しく）
+3️⃣ 今日のおすすめアクション ✅（3〜5個）
+4️⃣ 今日は避けた方がいいこと ⚠️（3個）
+5️⃣ 心がけたいキーワード 🗝️（3つ）
+6️⃣ ラッキー要素 🍀（カラー・ナンバー・フード）
+
+【スタイル厳守】
+・絵文字を適度に使用
+・1文は短め（全角18〜25文字目安）、改行は基本一文ごと
+・項目変わり目に必ず空行
+・専門用語は必ず噛み砕く`;
+
+    const userPrompt = `以下の占術データから、統合リーディングメッセージを出力してください。
+
+【基本情報】
+・生年月日: ${birthYear}年${birthMonth}月${birthDay}日
+・出生時間: ${birthTimeHour === 'unknown' ? '不明' : `${birthTimeHour}時${birthTimeMinute}分`}
+・出生地: ${birthPlace}
+・今日: ${today.toLocaleDateString('ja-JP')}
+
+【西洋占星術】
+・太陽星座: ${sunSign.name} ${sunSign.emoji}
+・月星座: ${moonSign.name} ${moonSign.emoji}${moonSign.approximate ? '（出生時間不明のため概算）' : ''}
+
+【数秘術】
+・ライフパスナンバー: ${numerology.lifePath} (${numerologyMeanings[numerology.lifePath]?.keyword})
+・パーソナルイヤー: ${numerology.personalYear} (${numerologyMeanings[numerology.personalYear]?.keyword})
+・パーソナルデイ: ${numerology.personalDay} (${numerologyMeanings[numerology.personalDay]?.keyword})
+
+【四柱推命】
+・年柱: ${yearPillar.stem}${yearPillar.branch}
+・日柱: ${dayPillar.stem}${dayPillar.branch}
+・今日の干支: ${todayDayPillar.stem}${todayDayPillar.branch}
+
+【算命学】
+・中心星: ${mainStar.name}（${mainStar.tsuhensei}）
+
+【タロット】
+・引いたカード: ${drawnCard.name}（${drawnCard.meaning}）
+
+【今の気分】
+・エネルギー: ${energyOptions[qEnergy]}
+・選んだ道: ${pathOptions[qPath]}
+・欲しい感覚: ${mindOptions[qMind]}`;
+
+    try {
+      const geminiKey = localStorage.getItem('gemini_api_key') || '';
+      if (!geminiKey) {
+        setReadingData({ ...calculatedData, mackeyMsg: generateDemoMessage(drawnCard, numerology, dayPillar, sunSign, mainStar) });
+        setScreen('result');
+        setApiError(true);
+        setIsCalculating(false);
+        return;
+      }
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: userPrompt }] }],
+          systemInstruction: { parts: [{ text: systemInstruction }] }
+        })
+      });
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}));
+        console.error('Gemini API error', response.status, errBody);
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const result = await response.json();
+      const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (generatedText) {
+        setReadingData({ ...calculatedData, mackeyMsg: generatedText });
+        setScreen('result');
+      } else throw new Error('No text');
+    } catch (error) {
+      console.error('Reading generation failed:', error);
+      setReadingData({ ...calculatedData, mackeyMsg: generateDemoMessage(drawnCard, numerology, dayPillar, sunSign, mainStar) });
+      setScreen('result');
+      setApiError(true);
+    } finally {
+      setIsCalculating(false);
+    }
+  };
+
+  const generateDemoMessage = (card, num, day, sun, star) => {
+    const today = new Date();
+    const todayPillar = calculateDayPillar(today.getFullYear(), today.getMonth() + 1, today.getDate());
+    return `1️⃣ 今日のエネルギー総括
+
+今日のキーワードは「${card.meaning.split('・')[0]}」と「${numerologyMeanings[num.personalDay]?.keyword}」。
+
+タロットで引いた『${card.name}』が運んでくるのは、いつもの自分にちょっと風穴をあけるような新鮮なエネルギーです。
+
+そこに数秘${num.personalDay}番のリズム（${numerologyMeanings[num.personalDay]?.desc}）が重なっていて、行動するというより「気づきを受け取る」のが今日のテーマ。
+
+さらに今日の干支は『${todayPillar.stem}${todayPillar.branch}』（${stemElements[todayPillar.stem]}）。
+
+あなたの命式の核『${day.stem}${day.branch}』と柔らかく響き合う関係性で、無理せず流れに乗ると自然と前に進めます。
+
+
+2️⃣ 統合リーディング 🔮
+
+今日は「自分のペースを取り戻す日」と覚えておいて。
+
+${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう「ゆるんで内側を整える日」と相性がいいタイプです。
+
+数秘術で見ると、${today.getFullYear()}年は『${num.personalYear}』の年（${numerologyMeanings[num.personalYear]?.keyword}）。
+
+今年全体の流れは『${numerologyMeanings[num.personalYear]?.desc}』の方向に進んでいて、今日はその大きなテーマの中の「ちょっと立ち止まる日」です。
+
+算命学の主星『${star.name}』(${star.meaning.split('・')[0]})が「自分らしさを思い出して」とそっと背中を押してくれているのが今日の構図。
+
+
+3️⃣ 今日のおすすめアクション ✅
+
+・朝、深呼吸を3回してから一日を始める
+・気になっていた小さなことを一つ片付ける
+・空を見上げて雲の形を眺めてみる
+・好きな飲み物をゆっくり味わう
+・自分にひとこと「ありがとう」と伝える
+
+
+4️⃣ 今日は避けた方がいいこと ⚠️
+
+・SNSを長時間眺め続けること
+・自分を他人と比べてしまうこと
+・無理に予定を詰めること
+
+
+5️⃣ 心がけたいキーワード 🗝️
+
+🗝️ 自分軸
+🗝️ 余白
+🗝️ ${card.meaning.split('・')[0]}
+
+
+6️⃣ ラッキー要素 🍀
+
+🍀 ラッキーカラー：オレンジ・ゴールド
+🍀 ラッキーナンバー：${num.personalDay}
+🍀 ラッキーフード：旬の果物
+
+`;
+  };
+
+  // ==========================================
+  // 詳細解説
+  // ==========================================
+  const fetchDetailExplanation = async (type) => {
+    setDetailModal(type);
+    setDetailContent('');
+    setIsLoadingDetail(true);
+
+    const prompts = {
+      horoscope: `この方の西洋占星術ホロスコープを、占い初心者でも理解できるレベルで詳しく解説してください（1200〜1500文字）。太陽星座: ${readingData.sunSign.name}、月星座: ${readingData.moonSign.name}、生年月日: ${birthYear}/${birthMonth}/${birthDay}。絵文字を要所に使い、1文は短め、改行多め。`,
+      shichuusuimei: `四柱推命の解説（800〜1000文字）。年柱: ${readingData?.yearPillar?.stem}${readingData?.yearPillar?.branch}、日柱: ${readingData?.dayPillar?.stem}${readingData?.dayPillar?.branch}、今日: ${readingData?.todayDayPillar?.stem}${readingData?.todayDayPillar?.branch}。絵文字・改行多め・専門用語説明つき。`,
+      sanmeigaku: `算命学の解説（1000〜1200文字）。中心星: ${readingData?.mainStar?.name}、日干: ${readingData?.dayPillar?.stem}。絵文字・改行多め・専門用語説明つき。`,
+      numerology: `数秘術の解説（800〜1000文字）。ライフパス: ${readingData?.numerology?.lifePath}、今年: ${readingData?.numerology?.personalYear}、今日: ${readingData?.numerology?.personalDay}。絵文字・改行多め・専門用語説明つき。`
+    };
+
+    try {
+      const geminiKey = localStorage.getItem('gemini_api_key') || '';
+      if (!geminiKey) { setDetailContent(generateDemoDetail(type)); setIsLoadingDetail(false); return; }
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompts[type] }] }] })
+      });
+      const result = await response.json();
+      setDetailContent(result.candidates?.[0]?.content?.parts?.[0]?.text || generateDemoDetail(type));
+    } catch (e) {
+      setDetailContent(generateDemoDetail(type));
+    } finally {
+      setIsLoadingDetail(false);
+    }
+  };
+
+  const generateDemoDetail = (type) => {
+    if (!readingData) return 'データがありません';
+    if (type === 'horoscope') return `🌟 太陽星座「${readingData.sunSign.name} ${readingData.sunSign.emoji}」\n\n太陽星座はあなたの本質的な性格と人生で輝く方向性を表します。\n\n「${readingData.sunSign.name}」の人は自分らしさを大切にしながら、独自の道を歩むタイプ。\n\n🌙 月星座「${readingData.moonSign.name} ${readingData.moonSign.emoji}」${readingData.moonSign.approximate ? '（概算）' : ''}\n\n月星座は内側のあなた・素の感情・無意識のリラックスポイントを示します。\n\n「${readingData.moonSign.name}」を月に持つあなたは、この星座の特徴が心の状態によく現れます。`;
+    if (type === 'shichuusuimei') return `🎴 四柱推命とは\n\n古代中国生まれの占いで、「年・月・日・時」の4つの柱の干支から運命を読みます。\n\n🌸 日柱「${readingData.dayPillar.stem}${readingData.dayPillar.branch}」\n\n天干「${readingData.dayPillar.stem}」は${stemElements[readingData.dayPillar.stem]}の性質で、表に出る性格・行動パターンを示します。\n\n🌊 今日「${readingData.todayDayPillar.stem}${readingData.todayDayPillar.branch}」との関係\n\n今日は自分の本質を素直に出せるエネルギーが流れています。`;
+    if (type === 'sanmeigaku') return `🔮 算命学とは\n\n古代中国の陰陽五行をベースにした、宿命と運命を読み解く占術です。\n\n⭐ あなたの中心星「${readingData.mainStar.name} ${readingData.mainStar.element}」\n\n${readingData.mainStar.meaning}\n\n自分の特性を活かせる場所にいる時、いちばん輝きます。\n\n💫 日干「${readingData.dayPillar.stem}」の本質エネルギー\n\n${stemElements[readingData.dayPillar.stem]}の性質があなたの根っこのエネルギーです。`;
+    return `🔢 数秘術とは\n\n古代から伝わる「数字には意味がある」という考え方をベースに、生年月日から人生を読み解きます。\n\n🌟 ライフパス「${readingData.numerology.lifePath}」\n\n${numerologyMeanings[readingData.numerology.lifePath]?.keyword} — ${numerologyMeanings[readingData.numerology.lifePath]?.desc}\n\n📅 今年（${new Date().getFullYear()}年）「${readingData.numerology.personalYear}」\n\n${numerologyMeanings[readingData.numerology.personalYear]?.keyword}のテーマが流れています。\n\n✨ 今日「${readingData.numerology.personalDay}」\n\n${numerologyMeanings[readingData.numerology.personalDay]?.keyword}が今日のエネルギーです。`;
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) setAudioUrl(URL.createObjectURL(file));
+  };
+
+  const handleMackeyImageUpload = (which, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { alert('画像ファイルを選択してください'); return; }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxWidth = 800;
+        const scale = Math.min(maxWidth / img.width, 1);
+        const w = img.width * scale, h = img.height * scale;
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        try {
+          localStorage.setItem(`mackey-image-${which}`, dataUrl);
+          setSetupImagesUploaded(prev => ({ ...prev, [which]: true }));
+        } catch (err) { alert('保存できませんでした。画像が大きすぎる可能性があります 🙏'); }
+      };
+      img.onerror = () => alert('画像の読み込みに失敗しました');
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearMackeyImage = (which) => {
+    if (confirm(`画像${which}をリセットしますか？`)) {
+      localStorage.removeItem(`mackey-image-${which}`);
+      setSetupImagesUploaded(prev => ({ ...prev, [which]: false }));
+    }
+  };
+
+  const exportStandaloneHTML = async () => {
+    const img1 = localStorage.getItem('mackey-image-1');
+    const img2 = localStorage.getItem('mackey-image-2');
+    const img3 = localStorage.getItem('mackey-image-3');
+    if (!img1 || !img2 || !img3) { alert('画像が3枚揃っていません。先に3枚すべてアップロードしてください 🙏'); return; }
+    try {
+      const response = await fetch(window.location.href);
+      const html = await response.text();
+      const embedScript = `<script>window.__embeddedMackeyImages = ${JSON.stringify({ '1': img1, '2': img2, '3': img3 })};<\/script>`;
+      const modified = html.replace('</head>', `${embedScript}\n</head>`);
+      const blob = new Blob([modified], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `MackeyJourneyMessage-Shared-${new Date().toISOString().slice(0, 10)}.html`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      alert('共有用HTMLをダウンロードしました ✨');
+    } catch (e) { alert('生成エラー: ' + e.message); }
+  };
+
+  const getStoredMackeyImage = (which) => {
+    if (typeof localStorage === 'undefined') return null;
+    return localStorage.getItem(`mackey-image-${which}`);
+  };
+
+  const toggleAudio = () => {
+    if (audioRef.current) {
+      isPlaying ? audioRef.current.pause() : audioRef.current.play();
+      setIsPlaying(!isPlaying);
+    }
+  };
+  const saveApiKey = () => { localStorage.setItem('gemini_api_key', apiKeyInput); alert('APIキーを保存しました ✨'); };
+
+  // ==========================================
+  // 共通コンポーネント
+  // ==========================================
+  const SparkleDecorations = () => (
+    <>
+      <div className="absolute top-[10%] left-[10%] text-yellow-300 animate-sparkle"><Sparkles size={20}/></div>
+      <div className="absolute top-[20%] right-[12%] text-orange-300 animate-sparkle" style={{animationDelay: '1s'}}><Sparkles size={16}/></div>
+      <div className="absolute bottom-[20%] left-[15%] text-amber-300 animate-sparkle" style={{animationDelay: '0.5s'}}><Sparkles size={14}/></div>
+      <div className="absolute bottom-[15%] right-[20%] text-yellow-200 animate-sparkle" style={{animationDelay: '1.5s'}}><Sparkles size={18}/></div>
+    </>
+  );
+
+  const AudioPlayer = () => {
+    if (!audioUrl) return null;
+    return (
+      <div className="bg-white/90 backdrop-blur rounded-3xl shadow-lg border-2 border-orange-200 p-4 mb-4 relative overflow-hidden">
+        <div className="absolute -top-2 -right-2 w-20 h-20 bg-gradient-to-br from-orange-200 to-pink-200 rounded-full opacity-40"></div>
+        <div className="relative z-10 flex items-center gap-3">
+          <button onClick={toggleAudio}
+            className="w-12 h-12 flex items-center justify-center rounded-full text-white shadow-lg flex-shrink-0 transition-transform hover:scale-110"
+            style={{background: 'linear-gradient(135deg, #f97316, #ec4899)'}}>
+            {isPlaying ? <Pause size={20} fill="currentColor"/> : <Play size={20} fill="currentColor" className="ml-0.5"/>}
+          </button>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-sm font-bold text-stone-800 truncate flex items-center gap-1">
+              <Music size={14} className="text-orange-500"/>{audioTitle}
+            </h2>
+            <p className="text-xs text-stone-500 mt-0.5">{profile.name}からの肉声メッセージ 🎙️</p>
+          </div>
+        </div>
+        <audio ref={audioRef} src={audioUrl} onEnded={() => setIsPlaying(false)} onPause={() => setIsPlaying(false)} onPlay={() => setIsPlaying(true)} className="hidden"/>
+      </div>
+    );
+  };
+
+  // ==========================================
+  // 動画リンクカード（URLが設定された時のみ表示・タップでYouTubeを開く）
+  // ==========================================
+  const VideoPlayer = () => {
+    if (!videoUrl || !videoUrl.trim()) return null;
+
+    // VideoIDを抽出してサムネURL生成
+    const getYoutubeId = (url) => {
+      try {
+        const shortMatch = url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
+        if (shortMatch) return shortMatch[1];
+        const watchMatch = url.match(/[?&]v=([A-Za-z0-9_-]{11})/);
+        if (watchMatch) return watchMatch[1];
+        const embedMatch = url.match(/youtube\.com\/embed\/([A-Za-z0-9_-]{11})/);
+        if (embedMatch) return embedMatch[1];
+        const shortsMatch = url.match(/youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/);
+        if (shortsMatch) return shortsMatch[1];
+        return null;
+      } catch(e) { return null; }
+    };
+
+    const ytId = getYoutubeId(videoUrl);
+    const thumbnailUrl = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : null;
+    // クリーンなYouTube URLを再構成
+    const openUrl = ytId ? `https://www.youtube.com/watch?v=${ytId}` : videoUrl;
+
+    return (
+      <a
+        href={openUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block mb-4 rounded-3xl overflow-hidden shadow-xl border-2 border-stone-700 bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 active:scale-[0.98] transition-transform"
+      >
+        {/* ヘッダー行 */}
+        <div className="px-4 py-3 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-orange-400 shadow-md flex-shrink-0">
+            <MackeyImage which="2" className="w-full h-full object-cover" alt={profile.name}/>
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-sm font-bold text-white truncate flex items-center gap-1.5">
+              <span className="text-red-400">▶</span>{videoTitle}
+            </h2>
+            <p className="text-xs text-stone-400 mt-0.5">{profile.name}からの動画メッセージ 🎬</p>
+          </div>
+          {/* 外部リンクアイコン */}
+          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-600 flex items-center justify-center shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white">
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.25 8.25 0 0 0 4.83 1.55V6.79a4.85 4.85 0 0 1-1.06-.1z"/>
+            </svg>
+          </div>
+        </div>
+
+        {/* サムネイルエリア（YouTubeの場合のみ） */}
+        {thumbnailUrl && (
+          <div className="relative mx-3 mb-3 rounded-2xl overflow-hidden" style={{aspectRatio: '16/9'}}>
+            <img
+              src={thumbnailUrl}
+              alt={videoTitle}
+              className="w-full h-full object-cover"
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+            {/* 再生ボタンオーバーレイ */}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+              <div className="w-16 h-16 rounded-full bg-red-600/90 flex items-center justify-center shadow-2xl">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="white">
+                  <polygon points="6 3 20 12 6 21 6 3"/>
+                </svg>
+              </div>
+            </div>
+            {/* YouTubeバッジ */}
+            <div className="absolute bottom-2 right-2 bg-black/70 rounded px-1.5 py-0.5">
+              <span className="text-white text-[10px] font-bold">YouTube</span>
+            </div>
+          </div>
+        )}
+
+        {/* タップ誘導テキスト */}
+        <div className="px-4 pb-3 text-center">
+          <p className="text-xs text-stone-400">
+            タップして YouTube で視聴する ↗
+          </p>
+        </div>
+      </a>
+    );
+  };
+
+  const Header = () => (
+    <header className="bg-gradient-to-r from-orange-400 via-pink-400 to-orange-400 text-white shadow-lg relative overflow-hidden mb-4">
+      <div className="absolute inset-0 opacity-20">
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className="absolute text-white animate-sparkle" style={{top: `${(i*17)%100}%`, left: `${(i*13)%100}%`, animationDelay: `${i*0.4}s`}}><Sparkles size={12}/></div>
+        ))}
+      </div>
+      <div className="max-w-md mx-auto px-4 py-3 relative z-10 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-white/30 backdrop-blur flex items-center justify-center overflow-hidden border-2 border-white/50">
+            <MackeyImage which="1" className="w-full h-full object-cover" alt={profile.name}/>
+          </div>
+          <span className="font-bold tracking-wider text-sm">{profile.name}の旅✈️</span>
+        </div>
+        <button onClick={handleLogout} className="text-white/90 hover:text-white p-2 hover:bg-white/20 rounded-full transition"><LogOut size={18}/></button>
+      </div>
+    </header>
+  );
+
+  // ==========================================
+  // ログイン画面（パスワードヒントなし）
+  // ==========================================
+  if (screen === 'login') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden sparkle-bg">
+        <SparkleDecorations/>
+        <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-orange-200 to-pink-200 rounded-full blur-3xl opacity-40 -translate-y-1/3 translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-yellow-200 to-orange-200 rounded-full blur-3xl opacity-40 translate-y-1/3 -translate-x-1/3"></div>
+
+        <div className="bg-white/90 backdrop-blur p-6 rounded-[2.5rem] shadow-2xl w-full max-w-md border-4 border-white relative z-10">
+          <div className="relative -mx-2 -mt-2 mb-4">
+            <div className="rounded-[2rem] overflow-hidden shadow-lg aspect-[4/3] bg-gradient-to-br from-amber-100 to-orange-100">
+              <MackeyImage which="2" className="w-full h-full object-cover" alt={profile.name}/>
+            </div>
+            <div className="absolute -top-3 -right-3 text-yellow-400 animate-spin-slow"><Sparkles size={32}/></div>
+            <div className="absolute -bottom-2 -left-2 text-pink-400 animate-bounce-soft"><Star size={24} fill="currentColor"/></div>
+          </div>
+
+          <h1 className="text-3xl font-bold text-center mb-1 shimmer-text font-serif-jp tracking-wide">{profile.appTitle}</h1>
+          <h2 className="text-xl font-bold text-center text-stone-700 mb-2 tracking-widest">{profile.appSubtitle}</h2>
+          <p className="text-center text-stone-500 mb-6 text-xs">{profile.tagline}</p>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <KeyRound size={18} className="text-orange-400"/>
+              </div>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+                className="block w-full pl-11 pr-3 py-3.5 border-2 border-orange-100 rounded-2xl bg-orange-50/50 focus:ring-2 focus:ring-orange-400 focus:border-orange-300 text-sm outline-none"
+                placeholder="合言葉を入力"/>
+            </div>
+            {passwordError && <p className="text-sm text-pink-500 text-center animate-pulse">{passwordError}</p>}
+            <button type="submit" className="w-full py-3.5 rounded-2xl font-bold text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all"
+              style={{background: 'linear-gradient(135deg, #fb923c, #ec4899)'}}>
+              旅を始める ✈️
+            </button>
+          </form>
+          <div className="mt-5 pt-4 border-t border-orange-100 flex items-center justify-around">
+            <button onClick={() => setScreen('gallery')}
+              className="text-stone-500 hover:text-pink-500 text-xs flex items-center justify-center gap-1 transition-colors">
+              <Heart size={12}/> {profile.name}って誰？
+            </button>
+            <button onClick={() => { setScreen('adminLogin'); setPasswordError(''); }}
+              className="text-stone-400 hover:text-orange-500 text-xs flex items-center justify-center gap-1 transition-colors">
+              <Settings size={12}/> 管理者用
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // ギャラリー（プロフィール表示）
+  // ==========================================
+  if (screen === 'gallery') {
+    return (
+      <div className="min-h-screen pb-12 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-pink-200 to-orange-200 rounded-full blur-3xl opacity-40 -translate-y-1/3 translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-yellow-200 to-amber-200 rounded-full blur-3xl opacity-40 translate-y-1/3 -translate-x-1/3"></div>
+        <SparkleDecorations/>
+
+        <header className="bg-gradient-to-r from-orange-400 via-pink-400 to-orange-400 text-white shadow-lg mb-4">
+          <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+            <button onClick={() => setScreen('login')} className="text-white/90 hover:text-white text-sm font-bold flex items-center gap-1">← 戻る</button>
+            <span className="font-bold text-sm tracking-wider">{profile.name}の世界 ✨</span>
+            <div className="w-12"></div>
+          </div>
+        </header>
+
+        <main className="max-w-md mx-auto px-4 space-y-5 animate-fade-in-up">
+          <div className="relative rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white aspect-[4/3] bg-gradient-to-br from-amber-100 to-pink-100">
+            <MackeyImage which="2" className="w-full h-full object-cover" alt={profile.name}/>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 p-4">
+              <p className="text-white text-2xl font-bold font-serif-jp drop-shadow-lg">{profile.name}</p>
+              <p className="text-white/90 text-xs">{profile.title}</p>
+            </div>
+            <div className="absolute top-4 right-4 text-yellow-300 animate-spin-slow"><Sparkles size={32}/></div>
+          </div>
+
+          <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-lg border-2 border-orange-100">
+            <h2 className="text-base font-bold text-orange-600 mb-3 flex items-center gap-2">
+              <Star size={16} fill="currentColor" className="text-yellow-400"/> About {profile.name}
+            </h2>
+            <div className="text-sm text-stone-700 leading-[2.0]">
+              {profile.bio1.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < profile.bio1.split('\n').length - 1 && <br/>}</React.Fragment>)}
+            </div>
+            <div className="text-sm text-stone-600 leading-[2.0] mt-3">
+              {profile.bio2.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < profile.bio2.split('\n').length - 1 && <br/>}</React.Fragment>)}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-2xl overflow-hidden shadow-lg border-2 border-white aspect-[3/4] bg-gradient-to-br from-orange-100 to-pink-100 relative">
+              <MackeyImage which="1" className="w-full h-full object-cover" alt={profile.photo1Label}/>
+              <div className="absolute bottom-2 left-2 bg-white/80 rounded-full px-2 py-0.5">
+                <p className="text-[10px] font-bold text-stone-700">{profile.photo1Label}</p>
+              </div>
+            </div>
+            <div className="rounded-2xl overflow-hidden shadow-lg border-2 border-white aspect-[3/4] bg-gradient-to-br from-blue-100 to-pink-100 relative">
+              <MackeyImage which="3" className="w-full h-full object-cover" alt={profile.photo2Label}/>
+              <div className="absolute bottom-2 left-2 bg-white/80 rounded-full px-2 py-0.5">
+                <p className="text-[10px] font-bold text-stone-700">{profile.photo2Label}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-orange-50 via-pink-50 to-yellow-50 rounded-3xl p-5 shadow-lg border-2 border-pink-200 relative overflow-hidden">
+            <div className="absolute top-2 right-2 text-yellow-400 animate-sparkle"><Sparkles size={20}/></div>
+            <p className="text-[10px] font-bold text-pink-600 mb-2 tracking-[0.2em]">💌 MESSAGE FROM {profile.name.toUpperCase()}</p>
+            <div className="text-sm text-stone-700 leading-[2.0] font-serif-jp">
+              {profile.message.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < profile.message.split('\n').length - 1 && <br/>}</React.Fragment>)}
+            </div>
+            <div className="text-sm text-stone-700 leading-[2.0] font-serif-jp mt-3">
+              {profile.message2.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i < profile.message2.split('\n').length - 1 && <br/>}</React.Fragment>)}
+            </div>
+            <p className="text-right text-xs text-orange-500 font-bold mt-4">— {profile.name}</p>
+          </div>
+
+          <div className="text-center pt-2 pb-6">
+            <button onClick={() => setScreen('login')}
+              className="text-white font-bold text-sm px-8 py-3 rounded-full shadow-lg hover:scale-[1.05] transition"
+              style={{background: 'linear-gradient(135deg, #fb923c, #ec4899)'}}>
+              ログインに戻る ✈️
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // 管理者ログイン（パスワードヒントなし）
+  // ==========================================
+  if (screen === 'adminLogin') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <div className="bg-white/90 backdrop-blur p-8 rounded-3xl shadow-xl w-full max-w-md border-2 border-orange-100">
+          <div className="flex justify-center mb-4">
+            <div className="bg-gradient-to-br from-stone-700 to-stone-900 p-4 rounded-full text-white shadow-lg"><Settings size={28}/></div>
+          </div>
+          <h1 className="text-xl font-bold text-center text-stone-800 mb-5">管理者ログイン</h1>
+          <form onSubmit={handleAdminLogin} className="space-y-4">
+            <input type="password" value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)}
+              className="w-full px-4 py-3 border-2 border-orange-100 rounded-2xl bg-orange-50/50 outline-none focus:border-orange-300"
+              placeholder="管理者パスワード"/>
+            {passwordError && <p className="text-sm text-pink-500 text-center">{passwordError}</p>}
+            <button type="submit" className="w-full py-3 rounded-2xl font-bold text-white bg-stone-800 hover:bg-stone-700">入室する</button>
+          </form>
+          <button onClick={() => { setScreen('login'); setAdminPassword(''); setPasswordError(''); }}
+            className="w-full mt-4 py-2 text-stone-500 text-sm">← 一般ログインに戻る</button>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // 管理者パネル（プロフィール編集追加）
+  // ==========================================
+  if (screen === 'adminPanel') {
+    return (
+      <div className="min-h-screen p-4 pb-12">
+        <div className="max-w-md mx-auto">
+          <div className="bg-white/90 backdrop-blur p-6 rounded-3xl shadow-xl border-2 border-orange-100">
+            <div className="flex justify-between items-center mb-5 border-b-2 border-orange-100 pb-3">
+              <h2 className="font-bold flex items-center gap-2 text-stone-800"><Settings size={20} className="text-orange-500"/> 管理者設定</h2>
+              <button onClick={handleLogout} className="text-stone-400"><LogOut size={20}/></button>
+            </div>
+
+            <div className="space-y-4">
+
+              {/* ==================== プロフィール編集 ==================== */}
+              <div className="p-4 bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl border-2 border-pink-200">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-bold flex items-center gap-2 text-stone-700">
+                    <Edit size={16} className="text-pink-500"/> プロフィール編集
+                  </label>
+                  <button
+                    onClick={() => { setEditingProfile(!editingProfile); setProfileDraft(profile); }}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-full transition ${editingProfile ? 'bg-stone-200 text-stone-600' : 'bg-pink-100 text-pink-700 hover:bg-pink-200'}`}>
+                    {editingProfile ? 'キャンセル' : '✏️ 編集する'}
+                  </button>
+                </div>
+
+                {profileSaved && (
+                  <div className="mb-3 p-2 bg-emerald-100 border border-emerald-300 rounded-xl text-center text-xs font-bold text-emerald-700">
+                    ✅ 保存しました！ギャラリーページに反映されています
+                  </div>
+                )}
+
+                {!editingProfile ? (
+                  // プレビュー表示
+                  <div className="space-y-2 text-sm">
+                    <div className="bg-white/70 rounded-xl p-3">
+                      <p className="text-[10px] font-bold text-stone-400 mb-0.5">名前・タイトル</p>
+                      <p className="font-bold text-stone-800">{profile.name}</p>
+                      <p className="text-stone-500 text-xs">{profile.title}</p>
+                    </div>
+                    <div className="bg-white/70 rounded-xl p-3">
+                      <p className="text-[10px] font-bold text-stone-400 mb-0.5">アプリタイトル</p>
+                      <p className="text-stone-700 text-xs">{profile.appTitle} / {profile.appSubtitle}</p>
+                    </div>
+                    <div className="bg-white/70 rounded-xl p-3">
+                      <p className="text-[10px] font-bold text-stone-400 mb-0.5">自己紹介①</p>
+                      <p className="text-stone-600 text-xs leading-relaxed line-clamp-2">{profile.bio1}</p>
+                    </div>
+                    <div className="bg-white/70 rounded-xl p-3">
+                      <p className="text-[10px] font-bold text-stone-400 mb-0.5">メッセージ</p>
+                      <p className="text-stone-600 text-xs leading-relaxed line-clamp-2">{profile.message}</p>
+                    </div>
+                  </div>
+                ) : (
+                  // 編集フォーム
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-[11px] font-bold text-stone-600 mb-1 block">名前</label>
+                      <input value={profileDraft.name} onChange={e => setProfileDraft({...profileDraft, name: e.target.value})}
+                        className="w-full p-2.5 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-400 bg-white"
+                        placeholder="例: マッキー"/>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-stone-600 mb-1 block">肩書き・タイトル</label>
+                      <input value={profileDraft.title} onChange={e => setProfileDraft({...profileDraft, title: e.target.value})}
+                        className="w-full p-2.5 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-400 bg-white"
+                        placeholder="例: 旅するサイキックコーチ ✈️"/>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-stone-600 mb-1 block">アプリタイトル（大）</label>
+                      <input value={profileDraft.appTitle} onChange={e => setProfileDraft({...profileDraft, appTitle: e.target.value})}
+                        className="w-full p-2.5 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-400 bg-white"
+                        placeholder="例: マッキーの"/>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-stone-600 mb-1 block">アプリタイトル（小）</label>
+                      <input value={profileDraft.appSubtitle} onChange={e => setProfileDraft({...profileDraft, appSubtitle: e.target.value})}
+                        className="w-full p-2.5 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-400 bg-white"
+                        placeholder="例: Journey Message ✨"/>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-stone-600 mb-1 block">ログイン画面のキャッチコピー</label>
+                      <input value={profileDraft.tagline} onChange={e => setProfileDraft({...profileDraft, tagline: e.target.value})}
+                        className="w-full p-2.5 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-400 bg-white"
+                        placeholder="例: 人生を旅するように生きるあなたへ 🗺️"/>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-stone-600 mb-1 block">自己紹介①（改行OK）</label>
+                      <textarea value={profileDraft.bio1} onChange={e => setProfileDraft({...profileDraft, bio1: e.target.value})}
+                        rows={4}
+                        className="w-full p-2.5 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-400 bg-white resize-none"
+                        placeholder="自己紹介文①"/>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-stone-600 mb-1 block">自己紹介②（改行OK）</label>
+                      <textarea value={profileDraft.bio2} onChange={e => setProfileDraft({...profileDraft, bio2: e.target.value})}
+                        rows={4}
+                        className="w-full p-2.5 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-400 bg-white resize-none"
+                        placeholder="自己紹介文②"/>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-stone-600 mb-1 block">メッセージ①（改行OK）</label>
+                      <textarea value={profileDraft.message} onChange={e => setProfileDraft({...profileDraft, message: e.target.value})}
+                        rows={3}
+                        className="w-full p-2.5 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-400 bg-white resize-none"
+                        placeholder="プロフィールページのメッセージ①"/>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-stone-600 mb-1 block">メッセージ②（改行OK）</label>
+                      <textarea value={profileDraft.message2} onChange={e => setProfileDraft({...profileDraft, message2: e.target.value})}
+                        rows={3}
+                        className="w-full p-2.5 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-400 bg-white resize-none"
+                        placeholder="プロフィールページのメッセージ②"/>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[11px] font-bold text-stone-600 mb-1 block">写真1ラベル</label>
+                        <input value={profileDraft.photo1Label} onChange={e => setProfileDraft({...profileDraft, photo1Label: e.target.value})}
+                          className="w-full p-2.5 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-400 bg-white"
+                          placeholder="⛩️ 神社"/>
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-stone-600 mb-1 block">写真2ラベル</label>
+                        <input value={profileDraft.photo2Label} onChange={e => setProfileDraft({...profileDraft, photo2Label: e.target.value})}
+                          className="w-full p-2.5 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-400 bg-white"
+                          placeholder="🌊 海辺"/>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 pt-1">
+                      <button onClick={handleSaveProfile}
+                        className="flex-1 py-2.5 rounded-xl font-bold text-white text-sm shadow-md flex items-center justify-center gap-1.5"
+                        style={{background: 'linear-gradient(135deg, #ec4899, #fb923c)'}}>
+                        <Save size={14}/> 保存する
+                      </button>
+                      <button onClick={handleResetProfile}
+                        className="px-4 py-2.5 rounded-xl font-bold text-stone-500 text-sm bg-stone-100 hover:bg-stone-200 border border-stone-200">
+                        初期化
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* ==================== APIキー ==================== */}
+              <div className="p-4 bg-gradient-to-br from-orange-50 to-pink-50 rounded-2xl border-2 border-orange-200">
+                <label className="text-sm font-bold mb-2 flex items-center gap-2 text-stone-700"><KeyRound size={16}/> Gemini APIキー</label>
+                <input type="password" value={apiKeyInput} onChange={(e) => setApiKeyInput(e.target.value)}
+                  className="w-full p-3 border-2 border-orange-200 rounded-xl bg-white text-sm outline-none focus:border-orange-400" placeholder="AIza..."/>
+                <button onClick={saveApiKey} className="w-full mt-2 py-2.5 rounded-xl font-bold text-white text-sm shadow-md"
+                  style={{background: 'linear-gradient(135deg, #fb923c, #ec4899)'}}>APIキーを保存 ✨</button>
+                <div className="mt-2 p-2.5 bg-orange-50 border border-orange-200 rounded-xl">
+                  <p className="text-[11px] text-stone-600 leading-[1.8]">
+                    📋 取得方法：<br/>
+                    ① <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-orange-600 underline font-bold">aistudio.google.com</a> にアクセス<br/>
+                    ② 「APIキーを作成」で発行<br/>
+                    ③ <span className="font-bold">AIza</span> で始まるキーをここに貼り付けて保存
+                  </p>
+                </div>
+              </div>
+
+              {/* ==================== 画像アップロード ==================== */}
+              <div className="p-4 bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl border-2 border-pink-200">
+                <label className="text-sm font-bold mb-3 flex items-center gap-2 text-stone-700"><Heart size={16} className="text-pink-500"/> {profile.name}画像3枚をアップロード</label>
+                <p className="text-xs text-stone-500 mb-3">画像はブラウザ内に保存されます（外部送信なし）</p>
+                {[
+                  { which: '1', label: '画像1（神社の写真など）', emoji: '⛩️' },
+                  { which: '2', label: '画像2（メイン・笑顔の写真など）', emoji: '✨' },
+                  { which: '3', label: '画像3（海辺・旅の写真など）', emoji: '🌊' }
+                ].map(({ which, label, emoji }) => {
+                  const hasImage = typeof localStorage !== 'undefined' && localStorage.getItem(`mackey-image-${which}`);
+                  return (
+                    <div key={which} className="mb-3 last:mb-0 bg-white/70 p-3 rounded-xl">
+                      <p className="text-xs font-bold text-stone-700 mb-1.5">{emoji} {label}</p>
+                      <div className="flex items-center gap-2">
+                        {hasImage && (
+                          <div className="w-12 h-12 rounded-lg overflow-hidden border-2 border-pink-200 flex-shrink-0">
+                            <img src={hasImage} alt="" className="w-full h-full object-cover"/>
+                          </div>
+                        )}
+                        <input type="file" accept="image/*"
+                          onChange={(e) => handleMackeyImageUpload(which, e)}
+                          className="text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-pink-100 file:text-pink-700 file:font-bold flex-1 min-w-0"/>
+                        {hasImage && (
+                          <button onClick={() => clearMackeyImage(which)} className="text-xs text-stone-400 hover:text-rose-500 px-2"><X size={14}/></button>
+                        )}
+                      </div>
+                      {hasImage ? (
+                        <p className="text-[10px] text-emerald-600 mt-1.5">✅ 保存済み</p>
+                      ) : (
+                        <p className="text-[10px] text-stone-400 mt-1.5">未設定（フォールバック画像が表示されます）</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* ==================== エクスポート ==================== */}
+              <div className="p-4 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border-2 border-emerald-300">
+                <label className="text-sm font-bold mb-2 flex items-center gap-2 text-stone-700">
+                  <Plane size={16} className="text-emerald-600"/> クライアント共有用にエクスポート
+                </label>
+                <p className="text-[11px] text-stone-600 leading-[1.7] mb-3">
+                  💡 画像が埋め込まれた単体HTMLファイルをダウンロードします。
+                  クライアントに送るだけで画像付きで開けます ✨
+                </p>
+                <button onClick={exportStandaloneHTML}
+                  className="w-full py-2.5 rounded-xl font-bold text-white text-sm shadow-md flex items-center justify-center gap-2"
+                  style={{background: 'linear-gradient(135deg, #10b981, #14b8a6)'}}>
+                  <Plane size={16}/> 共有用HTMLをダウンロード
+                </button>
+              </div>
+
+              {/* ==================== 音声 ==================== */}
+              <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border-2 border-amber-200">
+                <label className="text-sm font-bold mb-2 flex items-center gap-2 text-stone-700"><Music size={16} className="text-amber-500"/> 音声設定</label>
+                <input type="text" value={audioTitle} onChange={(e) => setAudioTitle(e.target.value)}
+                  className="w-full p-3 border-2 border-orange-100 rounded-2xl bg-white outline-none focus:border-orange-300 mb-2" placeholder="音声タイトル"/>
+                <div className="mb-2">
+                  <p className="text-xs text-stone-600 mb-1">ファイルアップロード</p>
+                  <input ref={fileInputRef} type="file" accept="audio/*" onChange={handleFileUpload}
+                    className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-orange-100 file:text-orange-700 file:font-bold w-full"/>
+                </div>
+                <div>
+                  <p className="text-xs text-stone-600 mb-1">または音声URL</p>
+                  <input type="url" value={audioUrl} onChange={(e) => setAudioUrl(e.target.value)}
+                    className="w-full p-3 border-2 border-orange-200 rounded-xl outline-none focus:border-orange-400" placeholder="https://..."/>
+                </div>
+              </div>
+
+              {/* ==================== 動画設定 ==================== */}
+              <div className="p-4 bg-gradient-to-br from-stone-800 to-stone-900 rounded-2xl border-2 border-stone-700">
+                <label className="text-sm font-bold mb-1 flex items-center gap-2 text-white">
+                  <span className="text-red-400">▶</span> 動画設定（任意）
+                </label>
+                <p className="text-[11px] text-stone-400 mb-3 leading-relaxed">
+                  URLを入力するとメッセージ画面の最下部に動画が表示されます。
+                  空白にすると動画エリアは表示されません 🎬
+                </p>
+                <input type="text" value={videoTitle} onChange={(e) => setVideoTitle(e.target.value)}
+                  className="w-full p-3 border-2 border-stone-600 rounded-2xl bg-stone-700 text-white text-sm outline-none focus:border-orange-400 mb-2 placeholder:text-stone-500"
+                  placeholder="動画タイトル（例：今週のマッキー動画メッセージ）"/>
+                <div>
+                  <p className="text-xs text-stone-400 mb-1">YouTube URL または 動画ファイルURL</p>
+                  <input type="url" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)}
+                    className="w-full p-3 border-2 border-stone-600 rounded-xl bg-stone-700 text-white text-sm outline-none focus:border-orange-400 placeholder:text-stone-500"
+                    placeholder="https://www.youtube.com/watch?v=..."/>
+                </div>
+                {videoUrl && videoUrl.trim() && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className="text-[10px] text-emerald-400 font-bold">✅ 動画が設定されています</span>
+                    <button onClick={() => setVideoUrl('')}
+                      className="text-[10px] text-stone-400 hover:text-red-400 underline ml-auto">クリア</button>
+                  </div>
+                )}
+                {(!videoUrl || !videoUrl.trim()) && (
+                  <p className="text-[10px] text-stone-500 mt-2">※ URL未入力 → メッセージ画面に動画エリアは表示されません</p>
+                )}
+              </div>
+
+              <button onClick={handleLogout} className="w-full py-3 rounded-2xl font-bold text-white shadow-lg"
+                style={{background: 'linear-gradient(135deg, #fb923c, #ec4899)'}}>ログアウト</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // 入力画面
+  // ==========================================
+  if (screen === 'input') {
+    return (
+      <div className="min-h-screen pb-12">
+        <Header/>
+        <main className="max-w-md mx-auto px-4">
+          <AudioPlayer/>
+          <section className="bg-white/95 backdrop-blur rounded-[2rem] shadow-xl border-4 border-white p-6 relative mt-6">
+            <div className="flex justify-center -mt-12 mb-3">
+              <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg bg-gradient-to-br from-orange-100 to-pink-100">
+                <MackeyImage which="3" className="w-full h-full object-cover" alt={profile.name}/>
+              </div>
+            </div>
+            <h2 className="text-lg font-bold text-center text-stone-800 mb-1">あなたの旅のはじまり 🗺️</h2>
+            <p className="text-center text-stone-500 text-xs mb-5">深く星を読むため、教えてくださいね ✨</p>
+            <form onSubmit={handleProceedToQuestions} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-orange-600 mb-1.5 ml-1">📅 生年月日</label>
+                <div className="grid grid-cols-3 gap-2">
+                  <select value={birthYear} onChange={(e) => setBirthYear(e.target.value)} className="w-full p-2.5 border-2 border-orange-100 rounded-xl bg-orange-50/30 text-sm focus:border-orange-400 outline-none" required>
+                    <option value="" disabled>年</option>
+                    {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(y => <option key={y} value={y}>{y}年</option>)}
+                  </select>
+                  <select value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)} className="w-full p-2.5 border-2 border-orange-100 rounded-xl bg-orange-50/30 text-sm focus:border-orange-400 outline-none" required>
+                    <option value="" disabled>月</option>
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map(m => <option key={m} value={m}>{m}月</option>)}
+                  </select>
+                  <select value={birthDay} onChange={(e) => setBirthDay(e.target.value)} className="w-full p-2.5 border-2 border-orange-100 rounded-xl bg-orange-50/30 text-sm focus:border-orange-400 outline-none" required>
+                    <option value="" disabled>日</option>
+                    {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(d => <option key={d} value={d}>{d}日</option>)}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-orange-600 mb-1.5 ml-1">🕐 出生時間（不明でもOK）</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <select value={birthTimeHour} onChange={(e) => { setBirthTimeHour(e.target.value); if(e.target.value === 'unknown') setBirthTimeMinute(''); }}
+                    className="w-full p-2.5 border-2 border-orange-100 rounded-xl bg-orange-50/30 text-sm focus:border-orange-400 outline-none" required>
+                    <option value="" disabled>時</option>
+                    <option value="unknown">わからない</option>
+                    {Array.from({ length: 24 }, (_, i) => <option key={i} value={i.toString().padStart(2, '0')}>{i}時</option>)}
+                  </select>
+                  <select value={birthTimeMinute} onChange={(e) => setBirthTimeMinute(e.target.value)}
+                    disabled={birthTimeHour === 'unknown' || birthTimeHour === ''}
+                    className="w-full p-2.5 border-2 border-orange-100 rounded-xl bg-orange-50/30 text-sm disabled:opacity-40 focus:border-orange-400 outline-none"
+                    required={birthTimeHour !== 'unknown' && birthTimeHour !== ''}>
+                    <option value="" disabled>分</option>
+                    {Array.from({ length: 60 }, (_, i) => <option key={i} value={i.toString().padStart(2, '0')}>{i.toString().padStart(2, '0')}分</option>)}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-orange-600 mb-1.5 ml-1">📍 出生地（都道府県）</label>
+                <select value={birthPlace} onChange={(e) => setBirthPlace(e.target.value)} className="w-full p-2.5 border-2 border-orange-100 rounded-xl bg-orange-50/30 text-sm focus:border-orange-400 outline-none" required>
+                  <option value="" disabled>選択してください</option>
+                  {prefectures.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+              <button type="submit" disabled={!isInputValid}
+                className={`w-full flex justify-center items-center gap-2 py-3.5 px-4 rounded-2xl shadow-lg text-sm font-bold text-white transition-all mt-2 ${!isInputValid ? 'bg-stone-300' : 'hover:scale-[1.02]'}`}
+                style={isInputValid ? {background: 'linear-gradient(135deg, #fb923c, #ec4899)'} : {}}>
+                次へ進む <ChevronRight size={18}/>
+              </button>
+            </form>
+          </section>
+        </main>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // 質問画面
+  // ==========================================
+  if (screen === 'questions') {
+    return (
+      <div className="min-h-screen pb-12">
+        <Header/>
+        <main className="max-w-md mx-auto px-4 animate-fade-in-up">
+          <div className="text-center mb-5">
+            <h2 className="text-2xl font-bold mb-1 shimmer-text font-serif-jp">コンパスの調整 🧭</h2>
+            <p className="text-xs text-stone-500">今のあなたの「現在地」を直感で✨</p>
+          </div>
+          <div className="space-y-4">
+            {[
+              { num: 1, q: '今のエネルギー、充電に例えると？', state: qEnergy, setter: setQEnergy, opts: energyOptions, emoji: '🔋' },
+              { num: 2, q: '目の前に道があります。直感で選ぶなら？', state: qPath, setter: setQPath, opts: pathOptions, emoji: '🌅' },
+              { num: 3, q: '今、心の中で一番「欲しい」と思う感覚は？', state: qMind, setter: setQMind, opts: mindOptions, emoji: '💖' }
+            ].map(({ num, q, state, setter, opts, emoji }) => (
+              <div key={num} className="bg-white/90 backdrop-blur rounded-2xl p-4 shadow-md border-2 border-orange-100">
+                <h3 className="text-sm font-bold text-stone-800 mb-2 flex items-center gap-2">
+                  <span className="bg-gradient-to-br from-orange-400 to-pink-400 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">{num}</span>
+                  <span>{emoji} {q}</span>
+                </h3>
+                <div className="space-y-2">
+                  {Object.entries(opts).map(([key, text]) => (
+                    <button key={key} onClick={() => setter(key)}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl border-2 text-sm transition-all ${state === key ? 'border-orange-400 bg-gradient-to-r from-orange-50 to-pink-50 font-bold text-stone-800 shadow-md' : 'border-orange-100 hover:border-orange-200 hover:bg-orange-50/30'}`}>
+                      {text}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div className="pt-2">
+              <button onClick={generateReading} disabled={!qEnergy || !qPath || !qMind || isCalculating}
+                className={`w-full flex justify-center items-center gap-2 py-4 px-4 rounded-2xl shadow-xl text-sm font-bold text-white transition-all ${(!qEnergy || !qPath || !qMind || isCalculating) ? 'bg-stone-300' : 'hover:scale-[1.02]'}`}
+                style={(qEnergy && qPath && qMind && !isCalculating) ? {background: 'linear-gradient(135deg, #fb923c, #ec4899)'} : {}}>
+                {isCalculating ? <><Sparkles size={18} className="animate-pulse-soft"/> {profile.name}が星を読み解いています...</> : <><Compass size={18}/> 今日のメッセージを受け取る ✨</>}
+              </button>
+              {apiError && <p className="text-xs text-pink-500 mt-2 text-center">APIエラー → デモメッセージで表示中</p>}
+            </div>
+            <div className="text-center pt-2">
+              <button onClick={() => setScreen('input')} className="text-stone-400 text-xs hover:text-orange-500">← 出生情報の入力に戻る</button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // 結果画面
+  // ==========================================
+  if (screen === 'result' && readingData) {
+    return (
+      <div className="min-h-screen pb-12 relative">
+        <Header/>
+        <main className="max-w-md mx-auto px-4 space-y-4 animate-fade-in-up">
+          <div className="flex justify-between items-center px-1">
+            <button onClick={() => setScreen('questions')} className="text-stone-500 text-xs hover:text-orange-500">← 戻る</button>
+            <p className="text-orange-600 text-xs tracking-widest font-bold">{readingData.date}</p>
+          </div>
+
+          {/* 占術サマリーカード */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white/90 backdrop-blur rounded-2xl p-3 shadow-md border-2 border-orange-100 relative overflow-hidden">
+              <div className="absolute top-1 right-1 text-yellow-300"><Sun size={16}/></div>
+              <p className="text-[10px] font-bold text-orange-500 mb-1">🌟 西洋占星術</p>
+              <div className="flex gap-1.5 items-end">
+                <div><p className="text-2xl font-bold text-stone-800 leading-none">{readingData.sunSign.emoji}</p><p className="text-[8px] text-stone-500 mt-0.5">☀️{readingData.sunSign.name}</p></div>
+                <div><p className="text-lg font-bold text-stone-800 leading-none">{readingData.moonSign.emoji}</p><p className="text-[8px] text-stone-500 mt-0.5">🌙{readingData.moonSign.name}</p></div>
+              </div>
+              <button onClick={() => fetchDetailExplanation('horoscope')}
+                className="mt-2 text-[10px] bg-orange-100 hover:bg-orange-200 text-orange-700 px-2 py-1 rounded-full font-bold w-full flex items-center justify-center gap-1">
+                <Info size={10}/> 詳しく
+              </button>
+            </div>
+
+            <div className="bg-white/90 backdrop-blur rounded-2xl p-3 shadow-md border-2 border-pink-100 relative overflow-hidden">
+              <div className="absolute top-1 right-1 text-pink-300"><Sparkles size={14}/></div>
+              <p className="text-[10px] font-bold text-pink-500 mb-1">🔢 数秘術</p>
+              <div className="flex gap-1.5 items-end">
+                <div><p className="text-2xl font-bold text-stone-800 leading-none">{readingData.numerology.lifePath}</p><p className="text-[8px] text-stone-500">本質</p></div>
+                <div><p className="text-lg font-bold text-pink-500 leading-none">{readingData.numerology.personalDay}</p><p className="text-[8px] text-stone-500">今日</p></div>
+              </div>
+              <p className="text-[10px] text-stone-600 mt-1 truncate">{numerologyMeanings[readingData.numerology.lifePath]?.keyword}</p>
+              <button onClick={() => fetchDetailExplanation('numerology')}
+                className="mt-2 text-[10px] bg-pink-100 hover:bg-pink-200 text-pink-700 px-2 py-1 rounded-full font-bold w-full flex items-center justify-center gap-1">
+                <Info size={10}/> 詳しく
+              </button>
+            </div>
+
+            <div className="bg-white/90 backdrop-blur rounded-2xl p-3 shadow-md border-2 border-amber-100 relative overflow-hidden">
+              <div className="absolute top-1 right-1 text-amber-400"><Moon size={14}/></div>
+              <p className="text-[10px] font-bold text-amber-600 mb-1">🎴 四柱推命</p>
+              <p className="text-xl font-bold text-stone-800 font-serif-jp">{readingData.dayPillar.stem}{readingData.dayPillar.branch}</p>
+              <p className="text-[10px] text-stone-600">{stemElements[readingData.dayPillar.stem]}</p>
+              <button onClick={() => fetchDetailExplanation('shichuusuimei')}
+                className="mt-2 text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-700 px-2 py-1 rounded-full font-bold w-full flex items-center justify-center gap-1">
+                <Info size={10}/> 命式を見る
+              </button>
+            </div>
+
+            <div className="bg-white/90 backdrop-blur rounded-2xl p-3 shadow-md border-2 border-rose-100 relative overflow-hidden">
+              <div className="absolute top-1 right-1 text-rose-300"><Star size={14}/></div>
+              <p className="text-[10px] font-bold text-rose-500 mb-1">⭐ 算命学</p>
+              <p className="text-base font-bold text-stone-800 font-serif-jp">{readingData.mainStar.name}</p>
+              <p className="text-base">{readingData.mainStar.element}</p>
+              <button onClick={() => fetchDetailExplanation('sanmeigaku')}
+                className="mt-2 text-[10px] bg-rose-100 hover:bg-rose-200 text-rose-700 px-2 py-1 rounded-full font-bold w-full flex items-center justify-center gap-1">
+                <Info size={10}/> 詳しく
+              </button>
+            </div>
+          </div>
+
+          {/* タロットカード */}
+          <div className="bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 rounded-3xl p-5 shadow-lg border-2 border-orange-200 text-center relative overflow-hidden">
+            <div className="absolute top-2 left-2 text-yellow-400 animate-sparkle"><Sparkles size={16}/></div>
+            <div className="absolute bottom-2 right-2 text-pink-300 animate-sparkle" style={{animationDelay: '1s'}}><Sparkles size={14}/></div>
+            <p className="text-[10px] font-bold text-orange-600 mb-2 tracking-[0.2em]">🎴 TODAY'S TAROT</p>
+            <div className="flex justify-center my-3 animate-float-slow">
+              <TarotCardSVG card={readingData.card} size={140}/>
+            </div>
+            <p className="text-sm font-bold text-stone-700 mt-2">{readingData.card.meaning}</p>
+          </div>
+
+          {/* メッセージ本体 */}
+          <div className="bg-gradient-to-br from-white via-orange-50 to-pink-50 rounded-[2rem] p-5 sm:p-7 shadow-2xl relative overflow-hidden border-4 border-white">
+            <div className="absolute -top-4 -right-4 text-yellow-300 animate-sparkle"><Sparkles size={32}/></div>
+            <div className="absolute top-10 right-10 text-pink-200 animate-sparkle" style={{animationDelay: '1s'}}><Sparkles size={20}/></div>
+            <div className="absolute bottom-20 -left-2 text-orange-200 animate-sparkle" style={{animationDelay: '2s'}}><Sparkles size={24}/></div>
+            <div className="relative z-10">
+              <div className="flex flex-col items-center mb-5 text-center">
+                <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-xl mb-3 ring-4 ring-orange-200/50">
+                  <MackeyImage which="2" className="w-full h-full object-cover" alt={profile.name}/>
+                </div>
+                <h3 className="text-[10px] font-bold text-orange-500 tracking-[0.3em]">JOURNEY LETTER</h3>
+                <p className="text-xl font-bold shimmer-text font-serif-jp tracking-wide">{profile.name}からのメッセージ</p>
+                <div className="w-12 h-1 bg-gradient-to-r from-orange-400 to-pink-400 mt-2 rounded-full"></div>
+              </div>
+              <FormattedText text={readingData.mackeyMsg}/>
+            </div>
+          </div>
+
+          {/* マッキーから一言 */}
+          {(() => {
+            const hitokoto = getMackeyHitokoto(new Date());
+            return (
+              <div className="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 rounded-3xl p-5 shadow-lg border-2 border-amber-200 relative overflow-hidden">
+                <div className="absolute top-2 right-2 text-yellow-400 animate-sparkle"><Sparkles size={20}/></div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-300 shadow-md flex-shrink-0">
+                    <MackeyImage which="2" className="w-full h-full object-cover" alt={profile.name}/>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-amber-600 tracking-[0.2em]">A WORD FROM {profile.name.toUpperCase()}</p>
+                    <p className="text-base font-bold text-stone-800 font-serif-jp">{profile.name}から一言 ✨</p>
+                  </div>
+                </div>
+                <div className="bg-white/80 rounded-2xl p-4 border border-amber-200">
+                  <p className="text-base font-bold text-amber-700 mb-2 font-serif-jp">{hitokoto.title}</p>
+                  <p className="text-[14px] leading-[2.0] text-stone-700">{hitokoto.body}</p>
+                </div>
+                <p className="text-[9px] text-stone-400 text-center mt-2">毎日違うメッセージが届きます 💌</p>
+              </div>
+            );
+          })()}
+
+          <div className="pt-2"><AudioPlayer/></div>
+          <VideoPlayer/>
+
+          <div className="text-center pt-4 pb-6">
+            <button onClick={() => setScreen('input')}
+              className="text-white font-bold text-sm px-6 py-3 rounded-full shadow-lg hover:scale-[1.05] transition"
+              style={{background: 'linear-gradient(135deg, #fb923c, #ec4899)'}}>
+              もう一度旅に出る ✈️
+            </button>
+          </div>
+        </main>
+
+        {/* 詳細モーダル */}
+        {detailModal && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur p-2 sm:p-4 animate-fade-in-up">
+            <div className="bg-white w-full max-w-md max-h-[90vh] rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col border-4 border-white">
+              <div className="flex items-center justify-between p-4 border-b-2 border-orange-100 bg-gradient-to-r from-orange-50 to-pink-50">
+                <h3 className="font-bold text-stone-800 flex items-center gap-2">
+                  {detailModal === 'horoscope' && <><Sun size={18} className="text-orange-500"/>ホロスコープ詳細</>}
+                  {detailModal === 'shichuusuimei' && <><Moon size={18} className="text-amber-500"/>四柱推命・命式</>}
+                  {detailModal === 'sanmeigaku' && <><Star size={18} className="text-rose-500"/>算命学詳細</>}
+                  {detailModal === 'numerology' && <><Sparkles size={18} className="text-pink-500"/>数秘術詳細</>}
+                </h3>
+                <button onClick={() => setDetailModal(null)} className="p-2 hover:bg-orange-100 rounded-full"><X size={18}/></button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-5">
+                {isLoadingDetail ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Sparkles size={40} className="text-orange-400 animate-pulse-soft mb-3"/>
+                    <p className="text-sm text-stone-500">{profile.name}が解説を準備中...</p>
+                  </div>
+                ) : (
+                  <>
+                    {detailModal === 'shichuusuimei' && (
+                      <div className="mb-4 p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border-2 border-amber-200">
+                        <p className="text-xs font-bold text-amber-600 mb-2 tracking-widest">📜 命式</p>
+                        <div className="grid grid-cols-2 gap-2 text-center">
+                          <div className="bg-white/70 p-2 rounded-xl">
+                            <p className="text-[10px] text-stone-500">年柱</p>
+                            <p className="text-lg font-bold font-serif-jp">{readingData.yearPillar.stem}{readingData.yearPillar.branch}</p>
+                          </div>
+                          <div className="bg-white/70 p-2 rounded-xl">
+                            <p className="text-[10px] text-stone-500">日柱（核）</p>
+                            <p className="text-lg font-bold font-serif-jp text-orange-600">{readingData.dayPillar.stem}{readingData.dayPillar.branch}</p>
+                          </div>
+                        </div>
+                        <p className="text-[10px] text-center mt-2 text-stone-500">今日の干支: {readingData.todayDayPillar.stem}{readingData.todayDayPillar.branch}</p>
+                      </div>
+                    )}
+                    {detailModal === 'sanmeigaku' && (
+                      <div className="mb-4 p-4 bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl border-2 border-rose-200 text-center">
+                        <p className="text-xs font-bold text-rose-600 mb-2 tracking-widest">⭐ あなたの主星</p>
+                        <p className="text-3xl mb-1">{readingData.mainStar.element}</p>
+                        <p className="text-xl font-bold font-serif-jp text-stone-800">{readingData.mainStar.name}</p>
+                        <p className="text-[10px] text-stone-500 mt-1">{readingData.mainStar.meaning}</p>
+                      </div>
+                    )}
+                    {detailModal === 'horoscope' && (
+                      <div className="mb-4 p-4 bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl border-2 border-orange-200">
+                        <div className="grid grid-cols-2 gap-2 text-center">
+                          <div className="bg-white/80 p-3 rounded-xl">
+                            <p className="text-[10px] font-bold text-orange-600 mb-1">☀️ 太陽星座</p>
+                            <p className="text-3xl">{readingData.sunSign.emoji}</p>
+                            <p className="text-base font-bold font-serif-jp text-stone-800">{readingData.sunSign.name}</p>
+                          </div>
+                          <div className="bg-white/80 p-3 rounded-xl">
+                            <p className="text-[10px] font-bold text-blue-500 mb-1">🌙 月星座</p>
+                            <p className="text-3xl">{readingData.moonSign.emoji}</p>
+                            <p className="text-base font-bold font-serif-jp text-stone-800">{readingData.moonSign.name}</p>
+                            {readingData.moonSign.approximate && <p className="text-[8px] text-stone-400 mt-0.5">※出生時間不明のため概算</p>}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {detailModal === 'numerology' && (
+                      <div className="mb-4 p-4 bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl border-2 border-pink-200">
+                        <p className="text-xs font-bold text-pink-600 mb-2 tracking-widest text-center">🔢 あなたの数秘</p>
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div className="bg-white/70 p-2 rounded-xl">
+                            <p className="text-[9px] text-stone-500">本質</p>
+                            <p className="text-2xl font-bold text-pink-600">{readingData.numerology.lifePath}</p>
+                          </div>
+                          <div className="bg-white/70 p-2 rounded-xl">
+                            <p className="text-[9px] text-stone-500">今年</p>
+                            <p className="text-2xl font-bold text-orange-500">{readingData.numerology.personalYear}</p>
+                          </div>
+                          <div className="bg-white/70 p-2 rounded-xl">
+                            <p className="text-[9px] text-stone-500">今日</p>
+                            <p className="text-2xl font-bold text-rose-500">{readingData.numerology.personalDay}</p>
+                          </div>
+                        </div>
+                        <p className="text-[10px] text-center mt-2 text-stone-500">本質: {numerologyMeanings[readingData.numerology.lifePath]?.keyword}</p>
+                      </div>
+                    )}
+                    <FormattedText text={detailContent}/>
+                  </>
+                )}
+              </div>
+              <div className="p-4 border-t-2 border-orange-100">
+                <button onClick={() => setDetailModal(null)}
+                  className="w-full py-3 rounded-2xl font-bold text-white shadow-md"
+                  style={{background: 'linear-gradient(135deg, #fb923c, #ec4899)'}}>閉じる</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return null;
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
