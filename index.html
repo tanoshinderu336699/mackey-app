@@ -101,6 +101,59 @@ const EMBEDDED_IMAGES = {
 // 埋め込みAPIキー（どの端末でも同じキーが使われる）
 const EMBEDDED_GEMINI_KEY = 'AIzaSyD7miE5twBqZDTW6BQwHfuPi9i91OOxj0k';
 
+// ==========================================
+// Supabase設定（管理画面の設定を全端末に同期）
+// ==========================================
+const SUPABASE_URL = 'https://vgtacqcfyqkwdxpsnsye.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_wCUlOADnMJbjNQrCeeihtw_SGc-Nhph';
+
+const supabaseFetch = async (method, id, value) => {
+  const url = `${SUPABASE_URL}/rest/v1/mackey_settings`;
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=minimal'
+  };
+  if (method === 'GET') {
+    const res = await fetch(`${url}?select=*`, { headers });
+    return res.json();
+  }
+  if (method === 'UPSERT') {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { ...headers, 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify({ id, value, updated_at: new Date().toISOString() })
+    });
+    return res.ok;
+  }
+};
+
+// Supabaseから全設定を読み込む
+const loadSettingsFromSupabase = async () => {
+  try {
+    const rows = await supabaseFetch('GET');
+    const result = {};
+    if (Array.isArray(rows)) {
+      rows.forEach(row => { result[row.id] = row.value; });
+    }
+    return result;
+  } catch(e) {
+    console.error('Supabase load error:', e);
+    return {};
+  }
+};
+
+// Supabaseに設定を保存する
+const saveSettingToSupabase = async (id, value) => {
+  try {
+    return await supabaseFetch('UPSERT', id, value);
+  } catch(e) {
+    console.error('Supabase save error:', e);
+    return false;
+  }
+};
+
 
 const { useState, useRef, useEffect } = React;
 
@@ -541,15 +594,18 @@ const FormattedText = ({ text, className = '' }) => {
 // ==========================================
 // マッキー画像
 // ==========================================
-const MackeyImage = ({ which = '1', className = '', alt = 'マッキー' }) => {
+const MackeyImage = ({ which = '1', className = '', alt = 'マッキー', dynamicImages = {} }) => {
   const [error, setError] = useState(false);
 
-  // 埋め込み画像を最優先（どの端末・ブラウザでも同じ画像が表示される）
-  const embeddedSrc = (typeof EMBEDDED_IMAGES !== 'undefined' && EMBEDDED_IMAGES[which])
-    ? EMBEDDED_IMAGES[which] : null;
+  // 優先順位：dynamicImages（Supabase）> EMBEDDED_IMAGES（コード埋め込み）> フォールバック
+  const src = (dynamicImages && dynamicImages[which])
+    ? dynamicImages[which]
+    : (typeof EMBEDDED_IMAGES !== 'undefined' && EMBEDDED_IMAGES[which])
+      ? EMBEDDED_IMAGES[which]
+      : null;
 
-  if (embeddedSrc && !error) {
-    return <img src={embeddedSrc} alt={alt} className={className} onError={() => setError(true)}/>;
+  if (src && !error) {
+    return <img src={src} alt={alt} className={className} onError={() => setError(true)}/>;
   }
 
   // フォールバックSVG
@@ -609,11 +665,19 @@ function App() {
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
 
   const [apiKeyInput, setApiKeyInput] = useState('');
-  const [audioUrl, setAudioUrl] = useState('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+  const [audioUrl, setAudioUrl] = useState('');
   const [audioTitle, setAudioTitle] = useState('今週のマッキーからのメッセージ');
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoUrl, setVideoUrl] = useState('');
   const [videoTitle, setVideoTitle] = useState('今週のマッキー動画メッセージ');
+  // Supabaseから動的に読み込む画像とAPIキー
+  const [dynamicImages, setDynamicImages] = useState({});
+  const [dynamicApiKey, setDynamicApiKey] = useState('');
+
+  // MackeyImageのラッパー（dynamicImagesを自動で渡す）
+  const MI = ({ which, className, alt }) => (
+    <MackeyImage which={which} className={className} alt={alt} dynamicImages={dynamicImages}/>
+  );
 
   const audioRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -622,24 +686,57 @@ function App() {
   const ADMIN_PASSWORD = 'admin-mackey';
 
   useEffect(() => {
-    const k = localStorage.getItem('gemini_api_key') || '';
-    setApiKeyInput(k);
+    // アプリ起動時にSupabaseから設定を読み込む
+    const loadSettings = async () => {
+      const settings = await loadSettingsFromSupabase();
+
+      // プロフィール
+      if (settings.profile && settings.profile !== '{}') {
+        try {
+          const p = JSON.parse(settings.profile);
+          if (Object.keys(p).length > 0) {
+            const merged = { ...DEFAULT_PROFILE, ...p };
+            setProfile(merged);
+            setProfileDraft(merged);
+          }
+        } catch(e) {}
+      }
+
+      // 音声
+      if (settings.audio_url) setAudioUrl(settings.audio_url);
+      if (settings.audio_title) setAudioTitle(settings.audio_title);
+
+      // 動画
+      if (settings.video_url) setVideoUrl(settings.video_url);
+      if (settings.video_title) setVideoTitle(settings.video_title);
+
+      // 画像（Supabaseに保存されていればそちらを優先）
+      if (settings.image_1) setDynamicImages(prev => ({ ...prev, '1': settings.image_1 }));
+      if (settings.image_2) setDynamicImages(prev => ({ ...prev, '2': settings.image_2 }));
+      if (settings.image_3) setDynamicImages(prev => ({ ...prev, '3': settings.image_3 }));
+
+      // APIキー（Supabaseに保存されていればそちらを優先）
+      if (settings.gemini_api_key) setDynamicApiKey(settings.gemini_api_key);
+    };
+    loadSettings();
   }, []);
 
   // プロフィール保存
-  const handleSaveProfile = () => {
-    saveProfile(profileDraft);
+  const handleSaveProfile = async () => {
+    saveProfile(profileDraft); // localStorageにも保存（バックアップ）
     setProfile(profileDraft);
     setEditingProfile(false);
+    await saveSettingToSupabase('profile', JSON.stringify(profileDraft));
     setProfileSaved(true);
     setTimeout(() => setProfileSaved(false), 3000);
   };
 
-  const handleResetProfile = () => {
+  const handleResetProfile = async () => {
     if (confirm('プロフィールをデフォルトに戻しますか？')) {
       localStorage.removeItem('mackey-profile');
       setProfile(DEFAULT_PROFILE);
       setProfileDraft(DEFAULT_PROFILE);
+      await saveSettingToSupabase('profile', '{}');
     }
   };
 
@@ -788,9 +885,9 @@ function App() {
 ・欲しい感覚: ${mindOptions[qMind]}`;
 
     try {
-      const geminiKey = (typeof EMBEDDED_GEMINI_KEY !== 'undefined' && EMBEDDED_GEMINI_KEY)
-        ? EMBEDDED_GEMINI_KEY
-        : localStorage.getItem('gemini_api_key') || '';
+      const geminiKey = dynamicApiKey
+        || (typeof EMBEDDED_GEMINI_KEY !== 'undefined' && EMBEDDED_GEMINI_KEY)
+        || localStorage.getItem('gemini_api_key') || '';
       if (!geminiKey) {
         setReadingData({ ...calculatedData, mackeyMsg: generateDemoMessage(drawnCard, numerology, dayPillar, sunSign, mainStar) });
         setScreen('result');
@@ -905,9 +1002,9 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
     };
 
     try {
-      const geminiKey = (typeof EMBEDDED_GEMINI_KEY !== 'undefined' && EMBEDDED_GEMINI_KEY)
-        ? EMBEDDED_GEMINI_KEY
-        : localStorage.getItem('gemini_api_key') || '';
+      const geminiKey = dynamicApiKey
+        || (typeof EMBEDDED_GEMINI_KEY !== 'undefined' && EMBEDDED_GEMINI_KEY)
+        || localStorage.getItem('gemini_api_key') || '';
       if (!geminiKey) { setDetailContent(generateDemoDetail(type)); setIsLoadingDetail(false); return; }
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
       const response = await fetch(url, {
@@ -944,7 +1041,7 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
     const reader = new FileReader();
     reader.onload = (event) => {
       const img = new Image();
-      img.onload = () => {
+      img.onload = async () => {
         const maxWidth = 800;
         const scale = Math.min(maxWidth / img.width, 1);
         const w = img.width * scale, h = img.height * scale;
@@ -952,11 +1049,16 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
         canvas.width = w; canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        try {
-          localStorage.setItem(`mackey-image-${which}`, dataUrl);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        // Supabaseに保存（全端末に反映）
+        const ok = await saveSettingToSupabase(`image_${which}`, dataUrl);
+        if (ok) {
+          setDynamicImages(prev => ({ ...prev, [which]: dataUrl }));
           setSetupImagesUploaded(prev => ({ ...prev, [which]: true }));
-        } catch (err) { alert('保存できませんでした。画像が大きすぎる可能性があります 🙏'); }
+          alert(`画像${which}を保存しました ✨\n全端末に反映されます！`);
+        } else {
+          alert('保存に失敗しました。画像が大きすぎる可能性があります 🙏');
+        }
       };
       img.onerror = () => alert('画像の読み込みに失敗しました');
       img.src = event.target.result;
@@ -964,9 +1066,10 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
     reader.readAsDataURL(file);
   };
 
-  const clearMackeyImage = (which) => {
+  const clearMackeyImage = async (which) => {
     if (confirm(`画像${which}をリセットしますか？`)) {
-      localStorage.removeItem(`mackey-image-${which}`);
+      await saveSettingToSupabase(`image_${which}`, '');
+      setDynamicImages(prev => ({ ...prev, [which]: '' }));
       setSetupImagesUploaded(prev => ({ ...prev, [which]: false }));
     }
   };
@@ -1003,7 +1106,11 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
       setIsPlaying(!isPlaying);
     }
   };
-  const saveApiKey = () => { localStorage.setItem('gemini_api_key', apiKeyInput); alert('APIキーを保存しました ✨'); };
+  const saveApiKey = async () => {
+    await saveSettingToSupabase('gemini_api_key', apiKeyInput);
+    setDynamicApiKey(apiKeyInput);
+    alert('APIキーを保存しました ✨\n全端末に反映されます！');
+  };
 
   // ==========================================
   // 共通コンポーネント
@@ -1076,7 +1183,7 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
         {/* ヘッダー行 */}
         <div className="px-4 py-3 flex items-center gap-3">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-orange-400 shadow-md flex-shrink-0">
-            <MackeyImage which="2" className="w-full h-full object-cover" alt={profile.name}/>
+            <MI which="2" className="w-full h-full object-cover" alt={profile.name}/>
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="text-sm font-bold text-white truncate flex items-center gap-1.5">
@@ -1136,7 +1243,7 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
       <div className="max-w-md mx-auto px-4 py-3 relative z-10 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-white/30 backdrop-blur flex items-center justify-center overflow-hidden border-2 border-white/50">
-            <MackeyImage which="1" className="w-full h-full object-cover" alt={profile.name}/>
+            <MI which="1" className="w-full h-full object-cover" alt={profile.name}/>
           </div>
           <span className="font-bold tracking-wider text-sm">{profile.name}の旅✈️</span>
         </div>
@@ -1158,7 +1265,7 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
         <div className="bg-white/90 backdrop-blur p-6 rounded-[2.5rem] shadow-2xl w-full max-w-md border-4 border-white relative z-10">
           <div className="relative -mx-2 -mt-2 mb-4">
             <div className="rounded-[2rem] overflow-hidden shadow-lg aspect-[4/3] bg-gradient-to-br from-amber-100 to-orange-100">
-              <MackeyImage which="2" className="w-full h-full object-cover" alt={profile.name}/>
+              <MI which="2" className="w-full h-full object-cover" alt={profile.name}/>
             </div>
             <div className="absolute -top-3 -right-3 text-yellow-400 animate-spin-slow"><Sparkles size={32}/></div>
             <div className="absolute -bottom-2 -left-2 text-pink-400 animate-bounce-soft"><Star size={24} fill="currentColor"/></div>
@@ -1218,7 +1325,7 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
 
         <main className="max-w-md mx-auto px-4 space-y-5 animate-fade-in-up">
           <div className="relative rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white aspect-[4/3] bg-gradient-to-br from-amber-100 to-pink-100">
-            <MackeyImage which="2" className="w-full h-full object-cover" alt={profile.name}/>
+            <MI which="2" className="w-full h-full object-cover" alt={profile.name}/>
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <p className="text-white text-2xl font-bold font-serif-jp drop-shadow-lg">{profile.name}</p>
@@ -1241,13 +1348,13 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
 
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-2xl overflow-hidden shadow-lg border-2 border-white aspect-[3/4] bg-gradient-to-br from-orange-100 to-pink-100 relative">
-              <MackeyImage which="1" className="w-full h-full object-cover" alt={profile.photo1Label}/>
+              <MI which="1" className="w-full h-full object-cover" alt={profile.photo1Label}/>
               <div className="absolute bottom-2 left-2 bg-white/80 rounded-full px-2 py-0.5">
                 <p className="text-[10px] font-bold text-stone-700">{profile.photo1Label}</p>
               </div>
             </div>
             <div className="rounded-2xl overflow-hidden shadow-lg border-2 border-white aspect-[3/4] bg-gradient-to-br from-blue-100 to-pink-100 relative">
-              <MackeyImage which="3" className="w-full h-full object-cover" alt={profile.photo2Label}/>
+              <MI which="3" className="w-full h-full object-cover" alt={profile.photo2Label}/>
               <div className="absolute bottom-2 left-2 bg-white/80 rounded-full px-2 py-0.5">
                 <p className="text-[10px] font-bold text-stone-700">{profile.photo2Label}</p>
               </div>
@@ -1524,15 +1631,18 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
                 <input type="text" value={audioTitle} onChange={(e) => setAudioTitle(e.target.value)}
                   className="w-full p-3 border-2 border-orange-100 rounded-2xl bg-white outline-none focus:border-orange-300 mb-2" placeholder="音声タイトル"/>
                 <div className="mb-2">
-                  <p className="text-xs text-stone-600 mb-1">ファイルアップロード</p>
-                  <input ref={fileInputRef} type="file" accept="audio/*" onChange={handleFileUpload}
-                    className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-orange-100 file:text-orange-700 file:font-bold w-full"/>
-                </div>
-                <div>
                   <p className="text-xs text-stone-600 mb-1">または音声URL</p>
                   <input type="url" value={audioUrl} onChange={(e) => setAudioUrl(e.target.value)}
                     className="w-full p-3 border-2 border-orange-200 rounded-xl outline-none focus:border-orange-400" placeholder="https://..."/>
                 </div>
+                <button onClick={async () => {
+                  await saveSettingToSupabase('audio_url', audioUrl);
+                  await saveSettingToSupabase('audio_title', audioTitle);
+                  alert('音声設定を保存しました ✨\n全端末に反映されます！');
+                }} className="w-full py-2.5 rounded-xl font-bold text-white text-sm shadow-md mt-1"
+                  style={{background: 'linear-gradient(135deg, #fb923c, #f59e0b)'}}>
+                  💾 音声設定を全端末に保存
+                </button>
               </div>
 
               {/* ==================== 動画設定 ==================== */}
@@ -1547,21 +1657,28 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
                 <input type="text" value={videoTitle} onChange={(e) => setVideoTitle(e.target.value)}
                   className="w-full p-3 border-2 border-stone-600 rounded-2xl bg-stone-700 text-white text-sm outline-none focus:border-orange-400 mb-2 placeholder:text-stone-500"
                   placeholder="動画タイトル（例：今週のマッキー動画メッセージ）"/>
-                <div>
+                <div className="mb-2">
                   <p className="text-xs text-stone-400 mb-1">YouTube URL または 動画ファイルURL</p>
                   <input type="url" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)}
                     className="w-full p-3 border-2 border-stone-600 rounded-xl bg-stone-700 text-white text-sm outline-none focus:border-orange-400 placeholder:text-stone-500"
                     placeholder="https://www.youtube.com/watch?v=..."/>
                 </div>
+                <button onClick={async () => {
+                  await saveSettingToSupabase('video_url', videoUrl);
+                  await saveSettingToSupabase('video_title', videoTitle);
+                  alert('動画設定を保存しました ✨\n全端末に反映されます！');
+                }} className="w-full py-2.5 rounded-xl font-bold text-white text-sm shadow-md mt-1"
+                  style={{background: 'linear-gradient(135deg, #374151, #111827)'}}>
+                  💾 動画設定を全端末に保存
+                </button>
                 {videoUrl && videoUrl.trim() && (
                   <div className="mt-2 flex items-center gap-2">
                     <span className="text-[10px] text-emerald-400 font-bold">✅ 動画が設定されています</span>
-                    <button onClick={() => setVideoUrl('')}
-                      className="text-[10px] text-stone-400 hover:text-red-400 underline ml-auto">クリア</button>
+                    <button onClick={async () => {
+                      setVideoUrl('');
+                      await saveSettingToSupabase('video_url', '');
+                    }} className="text-[10px] text-stone-400 hover:text-red-400 underline ml-auto">クリア</button>
                   </div>
-                )}
-                {(!videoUrl || !videoUrl.trim()) && (
-                  <p className="text-[10px] text-stone-500 mt-2">※ URL未入力 → メッセージ画面に動画エリアは表示されません</p>
                 )}
               </div>
 
@@ -1586,7 +1703,7 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
           <section className="bg-white/95 backdrop-blur rounded-[2rem] shadow-xl border-4 border-white p-6 relative mt-6">
             <div className="flex justify-center -mt-12 mb-3">
               <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg bg-gradient-to-br from-orange-100 to-pink-100">
-                <MackeyImage which="3" className="w-full h-full object-cover" alt={profile.name}/>
+                <MI which="3" className="w-full h-full object-cover" alt={profile.name}/>
               </div>
             </div>
             <h2 className="text-lg font-bold text-center text-stone-800 mb-1">あなたの旅のはじまり 🗺️</h2>
@@ -1780,7 +1897,7 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
             <div className="relative z-10">
               <div className="flex flex-col items-center mb-5 text-center">
                 <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-xl mb-3 ring-4 ring-orange-200/50">
-                  <MackeyImage which="2" className="w-full h-full object-cover" alt={profile.name}/>
+                  <MI which="2" className="w-full h-full object-cover" alt={profile.name}/>
                 </div>
                 <h3 className="text-[10px] font-bold text-orange-500 tracking-[0.3em]">JOURNEY LETTER</h3>
                 <p className="text-xl font-bold shimmer-text font-serif-jp tracking-wide">{profile.name}からのメッセージ</p>
@@ -1798,7 +1915,7 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
                 <div className="absolute top-2 right-2 text-yellow-400 animate-sparkle"><Sparkles size={20}/></div>
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-300 shadow-md flex-shrink-0">
-                    <MackeyImage which="2" className="w-full h-full object-cover" alt={profile.name}/>
+                    <MI which="2" className="w-full h-full object-cover" alt={profile.name}/>
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-amber-600 tracking-[0.2em]">A WORD FROM {profile.name.toUpperCase()}</p>
