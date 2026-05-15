@@ -626,6 +626,51 @@ const MackeyImage = ({ which = '1', className = '', alt = 'マッキー', dynami
 };
 
 // ==========================================
+// コピーボタンコンポーネント
+// ==========================================
+const CopyMessageButton = ({ mackeyMsg, date }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (!mackeyMsg) return;
+    const text = `${date} マッキーからのメッセージ\n\n${mackeyMsg}`;
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    }).catch(() => {
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    });
+  };
+
+  return (
+    <div className="mx-1 mb-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-4 border-2 border-orange-200">
+      <p className="text-xs text-stone-500 text-center mb-3 leading-relaxed">
+        📋 下のボタンを押すと今日のメッセージをコピーできるよ。<br/>
+        メモアプリや日記に貼り付けて使ってね 🌟
+      </p>
+      <button
+        onClick={handleCopy}
+        className="w-full py-3 rounded-2xl font-bold text-sm shadow-md transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+        style={{background: copied ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #fb923c, #ec4899)', color: 'white'}}>
+        {copied ? '✅ コピーしました！' : '📋 今日のメッセージをコピーする'}
+      </button>
+      {copied && (
+        <p className="text-xs text-emerald-600 text-center mt-2 font-bold">
+          メモアプリや日記に貼り付けてね 💕
+        </p>
+      )}
+    </div>
+  );
+};
+
+// ==========================================
 // メインアプリ
 // ==========================================
 function App() {
@@ -2103,46 +2148,7 @@ ${avoidSet[2]}
           <VideoPlayer/>
 
           {/* コピーボタン */}
-          {(() => {
-            const [copied, setCopied] = React.useState(false);
-            const handleCopy = () => {
-              if (!readingData?.mackeyMsg) return;
-              const text = `${readingData.date} マッキーからのメッセージ\n\n${readingData.mackeyMsg}`;
-              navigator.clipboard.writeText(text).then(() => {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 3000);
-              }).catch(() => {
-                // fallback
-                const el = document.createElement('textarea');
-                el.value = text;
-                document.body.appendChild(el);
-                el.select();
-                document.execCommand('copy');
-                document.body.removeChild(el);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 3000);
-              });
-            };
-            return (
-              <div className="mx-1 mb-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-4 border-2 border-orange-200">
-                <p className="text-xs text-stone-500 text-center mb-3 leading-relaxed">
-                  📋 下のボタンを押すと今日のメッセージをコピーできるよ。<br/>
-                  メモアプリや日記に貼り付けて使ってね 🌟
-                </p>
-                <button
-                  onClick={handleCopy}
-                  className="w-full py-3 rounded-2xl font-bold text-sm shadow-md transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
-                  style={{background: copied ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #fb923c, #ec4899)', color: 'white'}}>
-                  {copied ? '✅ コピーしました！' : '📋 今日のメッセージをコピーする'}
-                </button>
-                {copied && (
-                  <p className="text-xs text-emerald-600 text-center mt-2 font-bold">
-                    メモアプリや日記に貼り付けてね 💕
-                  </p>
-                )}
-              </div>
-            );
-          })()}
+          <CopyMessageButton mackeyMsg={readingData?.mackeyMsg} date={readingData?.date}/>
 
           <div className="text-center pt-2 pb-6">
             <button onClick={() => setScreen('input')}
