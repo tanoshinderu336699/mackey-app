@@ -443,6 +443,13 @@ const FormattedText = ({ text, className = '' }) => {
         if (content) result.push({ type: 'heading', content });
         return;
       }
+      // ラッキー要素などの「ラベル → 値」形式
+      const arrowMatch = line.match(/^(.+?)→(.+)$/);
+      if (arrowMatch && !line.startsWith('#')) {
+        const label = stripInline(arrowMatch[1]);
+        const value = stripInline(arrowMatch[2]);
+        if (label && value) { result.push({ type: 'arrow', label, value }); return; }
+      }
       const bulletMatch = line.match(/^[\*\-]\s+(.+)$/);
       if (bulletMatch) {
         const content = stripInline(bulletMatch[1]);
@@ -487,7 +494,15 @@ const FormattedText = ({ text, className = '' }) => {
           );
         }
 
-        if (line.type === 'bullet') {
+        if (line.type === 'arrow') {
+          return (
+            <div key={idx} className="flex items-center gap-2 pl-2">
+              <span className="text-[13px] font-bold text-stone-500 flex-shrink-0">{line.label}</span>
+              <span className="text-orange-400 font-bold flex-shrink-0">→</span>
+              <span className="text-[14px] font-bold text-stone-800">{line.value}</span>
+            </div>
+          );
+        }
           return (
             <div key={idx} className="flex gap-3 items-start pl-2 pr-1">
               <span className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-br from-orange-400 to-pink-400 flex items-center justify-center mt-[3px]">
@@ -702,22 +717,41 @@ function App() {
       todayDayPillar, sunSign, moonSign, mainStar
     };
 
-    const systemInstruction = `あなたは「旅するサイキックコーチ・${profile.name}」です。複数の占術データを統合し、温かくて旅人のようなトーンで今日のメッセージを伝えてください。
+    const systemInstruction = `あなたは「旅するサイキックコーチ・${profile.name}」です。
+明るくてテンション高め、友達に話しかけるようなノリで、でも深くて本質を突くメッセージを届けてください。
+「やっほー！」「ねえ聞いて！」「これすごくない！？」みたいな、ワクワクが伝わるトーンで書いてください。
 
-【📋 アウトプット構成】
-1️⃣ 今日のエネルギー総括（必ず300文字前後で詳しく）
-2️⃣ 統合リーディング 🔮（必ず400〜500文字で詳しく）
-3️⃣ 今日のおすすめアクション ✅（3〜5個）
-4️⃣ 今日は避けた方がいいこと ⚠️（3個）
-5️⃣ 心がけたいキーワード 🗝️（3つ）
-6️⃣ ラッキー要素 🍀（カラー・ナンバー・フード）
+【アウトプット構成】
+以下の6つの項目を、必ずこの順番・この見出しで書いてください。
+
+1️⃣ 今日のエネルギー総括
+（200〜250文字。今日という日のエネルギーを、友達に話すノリで伝える。タロット・数秘・干支を絡めて。）
+
+2️⃣ 統合リーディング 🔮
+（300〜350文字。複数の占術を統合して、今日のテーマと動き方を伝える。具体的でワクワクする内容に。）
+
+3️⃣ 今日のおすすめアクション ✅
+（3つだけ。各項目は「アクション名」のみ。一言で済む短さで。説明不要。）
+
+4️⃣ 今日は避けた方がいいこと ⚠️
+（3つだけ。「避けること」と一言コメントのみ。短く。）
+
+5️⃣ 心がけたいキーワード 🗝️
+（3つだけ。キーワードのみ。一言ずつ。）
+
+6️⃣ ラッキー要素 🍀
+以下の形式で3行だけ書く：
+ラッキーカラー → ○○
+ラッキーナンバー → ○
+ラッキーフード → ○○
 
 【スタイル厳守】
-・マークダウン記号（# ## ### * ** *** - など）は一切使わない
-・絵文字を適度に使用
-・1文は短め（全角18〜25文字目安）、改行は基本一文ごと
-・項目変わり目に必ず空行
-・専門用語は必ず噛み砕く`;
+・マークダウン記号（# ## ### * ** *** - など）は絶対に使わない
+・句読点（。、）を正しく使う
+・1文は短め、改行は1文ごと
+・各項目の見出しの前後には必ず空行を入れる
+・テンションは高め！絵文字を自然に使う
+・専門用語は使わず、友達に話すような言葉で`;
 
     const userPrompt = `以下の占術データから、統合リーディングメッセージを出力してください。
 
