@@ -885,8 +885,8 @@ function App() {
 ・欲しい感覚: ${mindOptions[qMind]}`;
 
     try {
-      const geminiKey = dynamicApiKey
-        || (typeof EMBEDDED_GEMINI_KEY !== 'undefined' && EMBEDDED_GEMINI_KEY)
+      const geminiKey = (typeof EMBEDDED_GEMINI_KEY !== 'undefined' && EMBEDDED_GEMINI_KEY)
+        || dynamicApiKey
         || localStorage.getItem('gemini_api_key') || '';
       if (!geminiKey) {
         setReadingData({ ...calculatedData, mackeyMsg: generateDemoMessage(drawnCard, numerology, dayPillar, sunSign, mainStar) });
@@ -1002,8 +1002,8 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
     };
 
     try {
-      const geminiKey = dynamicApiKey
-        || (typeof EMBEDDED_GEMINI_KEY !== 'undefined' && EMBEDDED_GEMINI_KEY)
+      const geminiKey = (typeof EMBEDDED_GEMINI_KEY !== 'undefined' && EMBEDDED_GEMINI_KEY)
+        || dynamicApiKey
         || localStorage.getItem('gemini_api_key') || '';
       if (!geminiKey) { setDetailContent(generateDemoDetail(type)); setIsLoadingDetail(false); return; }
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
