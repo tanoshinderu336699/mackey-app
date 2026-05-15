@@ -680,7 +680,6 @@ function App() {
   );
 
   const audioRef = useRef(null);
-  const fileInputRef = useRef(null);
 
   const CORRECT_PASSWORD = 'mackey2026';
   const ADMIN_PASSWORD = 'admin-mackey';
@@ -1629,55 +1628,28 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
               <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border-2 border-amber-200">
                 <label className="text-sm font-bold mb-2 flex items-center gap-2 text-stone-700"><Music size={16} className="text-amber-500"/> 音声設定</label>
 
-                {/* タイトル */}
                 <input type="text" value={audioTitle} onChange={(e) => setAudioTitle(e.target.value)}
                   className="w-full p-3 border-2 border-orange-100 rounded-2xl bg-white outline-none focus:border-orange-300 mb-3"
                   placeholder="音声タイトル（例：今週のマッキーからのメッセージ）"/>
 
-                {/* ファイルアップロード */}
                 <div className="mb-3 bg-white/70 rounded-xl p-3 border border-orange-200">
-                  <p className="text-xs font-bold text-stone-700 mb-1.5">🎵 ファイルをアップロード</p>
-                  <p className="text-[10px] text-stone-400 mb-2">WAV・MP3・AAC・FLAC・M4A・OGG など対応</p>
-                  <input
-                    type="file"
-                    accept="audio/*,.wav,.mp3,.aac,.flac,.m4a,.ogg,.wma,.opus"
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (!file) return;
-                      const url = URL.createObjectURL(file);
-                      setAudioUrl(url);
-                    }}
-                    className="text-xs w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-amber-100 file:text-amber-700 file:font-bold file:cursor-pointer"
-                  />
-                  {audioUrl && audioUrl.startsWith('blob:') && (
-                    <p className="text-[10px] text-emerald-600 mt-1.5 font-bold">✅ ファイルが選択されています</p>
-                  )}
-                  <p className="text-[10px] text-stone-400 mt-2 leading-relaxed">
-                    ⚠️ ファイルアップロードは<span className="font-bold">このブラウザのみ</span>で再生されます。<br/>
-                    全端末に反映したい場合はURLを使ってください。
+                  <p className="text-xs font-bold text-stone-700 mb-1.5">🔗 音声URL（全端末に反映）</p>
+                  <p className="text-[10px] text-stone-400 mb-2 leading-relaxed">
+                    Google Drive・Dropboxなどで音声ファイルを共有して、そのURLを貼り付けてください。
                   </p>
-                </div>
-
-                {/* URL入力 */}
-                <div className="mb-3 bg-white/70 rounded-xl p-3 border border-orange-200">
-                  <p className="text-xs font-bold text-stone-700 mb-1.5">🔗 または音声URLを入力（全端末に反映）</p>
                   <input
                     type="url"
-                    value={audioUrl && !audioUrl.startsWith('blob:') ? audioUrl : ''}
+                    value={audioUrl}
                     onChange={(e) => setAudioUrl(e.target.value)}
                     className="w-full p-2.5 border-2 border-orange-200 rounded-xl outline-none focus:border-orange-400 text-sm"
-                    placeholder="https://example.com/message.mp3"
+                    placeholder="https://drive.google.com/..."
                   />
-                  <p className="text-[10px] text-stone-400 mt-1.5 leading-relaxed">
-                    Google Drive・Dropbox・SoundCloudなどの共有URLを貼り付け
-                  </p>
+                  {audioUrl && (
+                    <p className="text-[10px] text-emerald-600 mt-1.5 font-bold">✅ URLが設定されています</p>
+                  )}
                 </div>
 
                 <button onClick={async () => {
-                  if (audioUrl && audioUrl.startsWith('blob:')) {
-                    alert('ファイルアップロードはURLではないため、全端末保存できません。\n音声URLを入力してください。');
-                    return;
-                  }
                   await saveSettingToSupabase('audio_url', audioUrl);
                   await saveSettingToSupabase('audio_title', audioTitle);
                   alert('音声設定を保存しました ✨\n全端末に反映されます！');
