@@ -411,54 +411,54 @@ const TarotCardSVG = ({ card, size = 200 }) => {
 const FormattedText = ({ text, className = '' }) => {
   if (!text) return null;
 
+  // インライン記号を完全除去
+  const stripInline = (str) => str
+    .replace(/\*\*\*([^*]+)\*\*\*/g, '$1')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/\*\*\*/g, '').replace(/\*\*/g, '').replace(/\*/g, '')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/#/g, '')
+    .trim();
+
+  // 見出しの絵文字＋テキストからグラデーションカラーを決定
+  const getHeadingStyle = (content) => {
+    if (content.includes('1️⃣') || content.includes('エネルギー')) return { bg: 'from-orange-400 to-amber-400', light: 'bg-orange-50 border-orange-200' };
+    if (content.includes('2️⃣') || content.includes('リーディング')) return { bg: 'from-violet-400 to-purple-500', light: 'bg-violet-50 border-violet-200' };
+    if (content.includes('3️⃣') || content.includes('アクション') || content.includes('おすすめ')) return { bg: 'from-emerald-400 to-teal-500', light: 'bg-emerald-50 border-emerald-200' };
+    if (content.includes('4️⃣') || content.includes('避け')) return { bg: 'from-rose-400 to-pink-500', light: 'bg-rose-50 border-rose-200' };
+    if (content.includes('5️⃣') || content.includes('キーワード')) return { bg: 'from-sky-400 to-blue-500', light: 'bg-sky-50 border-sky-200' };
+    if (content.includes('6️⃣') || content.includes('ラッキー')) return { bg: 'from-yellow-400 to-orange-400', light: 'bg-yellow-50 border-yellow-200' };
+    return { bg: 'from-stone-400 to-stone-500', light: 'bg-stone-50 border-stone-200' };
+  };
+
   const cleanAndFormat = (rawText) => {
     const lines = rawText.split('\n');
     const result = [];
 
     lines.forEach((line) => {
-      // まず行全体からマークダウン記号を除去するヘルパー
-      const stripInline = (str) => str
-        .replace(/\*\*\*([^*]+)\*\*\*/g, '$1')  // ***太字斜体***
-        .replace(/\*\*([^*]+)\*\*/g, '$1')       // **太字**
-        .replace(/\*([^*]+)\*/g, '$1')            // *斜体*
-        .replace(/\*\*\*/g, '')                   // ***残骸
-        .replace(/\*\*/g, '')                     // **残骸
-        .replace(/\*/g, '')                       // *残骸
-        .replace(/`([^`]+)`/g, '$1')              // `コード`
-        .replace(/#/g, '')                        // #残骸
-        .trim();
-
-      // ### ## # の見出し行
       const headingMatch = line.match(/^#{1,6}\s*(.+)$/);
       if (headingMatch) {
         const content = stripInline(headingMatch[1]);
         if (content) result.push({ type: 'heading', content });
         return;
       }
-
-      // * や - で始まる箇条書き
       const bulletMatch = line.match(/^[\*\-]\s+(.+)$/);
       if (bulletMatch) {
         const content = stripInline(bulletMatch[1]);
         if (content) result.push({ type: 'bullet', content });
         return;
       }
-
-      // 数字. で始まる番号付きリスト（1. 2. など）
       const numberedMatch = line.match(/^\d+\.\s+(.+)$/);
       if (numberedMatch) {
         const content = stripInline(numberedMatch[1]);
         if (content) result.push({ type: 'bullet', content });
         return;
       }
-
-      // 空行
       if (line.trim() === '') {
         result.push({ type: 'empty' });
         return;
       }
-
-      // 通常テキスト
       const content = stripInline(line);
       if (content === '') {
         result.push({ type: 'empty' });
@@ -466,29 +466,40 @@ const FormattedText = ({ text, className = '' }) => {
         result.push({ type: 'text', content });
       }
     });
-
     return result;
   };
 
   const lines = cleanAndFormat(text);
 
   return (
-    <div className={`space-y-1 ${className}`}>
+    <div className={`space-y-2 ${className}`}>
       {lines.map((line, idx) => {
-        if (line.type === 'empty') return <div key={idx} className="h-3"/>;
-        if (line.type === 'heading') return (
-          <p key={idx} className="text-[15px] font-bold text-stone-800 pt-3 pb-1 leading-[1.8]">
-            {line.content}
-          </p>
-        );
-        if (line.type === 'bullet') return (
-          <p key={idx} className="text-[15px] leading-[2.0] text-stone-700 pl-3 flex gap-2">
-            <span className="text-orange-400 flex-shrink-0 mt-1">・</span>
-            <span>{line.content}</span>
-          </p>
-        );
+        if (line.type === 'empty') return <div key={idx} className="h-2"/>;
+
+        if (line.type === 'heading') {
+          const style = getHeadingStyle(line.content);
+          return (
+            <div key={idx} className="pt-4 pb-1">
+              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-gradient-to-r ${style.bg} shadow-md`}>
+                <span className="text-white font-bold text-[15px] leading-snug">{line.content}</span>
+              </div>
+            </div>
+          );
+        }
+
+        if (line.type === 'bullet') {
+          return (
+            <div key={idx} className="flex gap-3 items-start pl-2 pr-1">
+              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-br from-orange-400 to-pink-400 flex items-center justify-center mt-[3px]">
+                <span className="text-white text-[10px] font-bold">✓</span>
+              </span>
+              <p className="text-[14px] leading-[1.9] text-stone-700 flex-1">{line.content}</p>
+            </div>
+          );
+        }
+
         return (
-          <p key={idx} className="text-[15px] leading-[2.0] text-stone-700">
+          <p key={idx} className="text-[14px] leading-[2.0] text-stone-700 px-1">
             {line.content}
           </p>
         );
@@ -672,8 +683,8 @@ function App() {
     setIsCalculating(true);
     setApiError(false);
     const today = new Date();
-    const seed = parseInt(birthYear) + parseInt(birthMonth) + parseInt(birthDay) + today.getDate() + today.getMonth();
-    const drawnCard = majorArcana[seed % majorArcana.length];
+    // タロット：毎回本当にランダムに引く
+    const drawnCard = majorArcana[Math.floor(Math.random() * majorArcana.length)];
 
     const numerology = calculateNumerology(birthYear, birthMonth, birthDay, today);
     const dayPillar = calculateDayPillar(birthYear, birthMonth, birthDay);
