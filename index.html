@@ -679,7 +679,7 @@ function App() {
         setIsCalculating(false);
         return;
       }
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${geminiKey}`;
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -788,7 +788,7 @@ ${sun.name}の太陽（${sun.emoji}）を持つあなたは、本来こういう
     try {
       const geminiKey = localStorage.getItem('gemini_api_key') || '';
       if (!geminiKey) { setDetailContent(generateDemoDetail(type)); setIsLoadingDetail(false); return; }
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${geminiKey}`;
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
