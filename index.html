@@ -410,19 +410,89 @@ const TarotCardSVG = ({ card, size = 200 }) => {
 // ==========================================
 const FormattedText = ({ text, className = '' }) => {
   if (!text) return null;
-  const paragraphs = text.split(/\n\s*\n/);
+
+  const cleanAndFormat = (rawText) => {
+    const lines = rawText.split('\n');
+    const result = [];
+
+    lines.forEach((line) => {
+      // まず行全体からマークダウン記号を除去するヘルパー
+      const stripInline = (str) => str
+        .replace(/\*\*\*([^*]+)\*\*\*/g, '$1')  // ***太字斜体***
+        .replace(/\*\*([^*]+)\*\*/g, '$1')       // **太字**
+        .replace(/\*([^*]+)\*/g, '$1')            // *斜体*
+        .replace(/\*\*\*/g, '')                   // ***残骸
+        .replace(/\*\*/g, '')                     // **残骸
+        .replace(/\*/g, '')                       // *残骸
+        .replace(/`([^`]+)`/g, '$1')              // `コード`
+        .replace(/#/g, '')                        // #残骸
+        .trim();
+
+      // ### ## # の見出し行
+      const headingMatch = line.match(/^#{1,6}\s*(.+)$/);
+      if (headingMatch) {
+        const content = stripInline(headingMatch[1]);
+        if (content) result.push({ type: 'heading', content });
+        return;
+      }
+
+      // * や - で始まる箇条書き
+      const bulletMatch = line.match(/^[\*\-]\s+(.+)$/);
+      if (bulletMatch) {
+        const content = stripInline(bulletMatch[1]);
+        if (content) result.push({ type: 'bullet', content });
+        return;
+      }
+
+      // 数字. で始まる番号付きリスト（1. 2. など）
+      const numberedMatch = line.match(/^\d+\.\s+(.+)$/);
+      if (numberedMatch) {
+        const content = stripInline(numberedMatch[1]);
+        if (content) result.push({ type: 'bullet', content });
+        return;
+      }
+
+      // 空行
+      if (line.trim() === '') {
+        result.push({ type: 'empty' });
+        return;
+      }
+
+      // 通常テキスト
+      const content = stripInline(line);
+      if (content === '') {
+        result.push({ type: 'empty' });
+      } else {
+        result.push({ type: 'text', content });
+      }
+    });
+
+    return result;
+  };
+
+  const lines = cleanAndFormat(text);
+
   return (
-    <div className={`space-y-6 ${className}`}>
-      {paragraphs.map((paragraph, idx) => (
-        <div key={idx} className="text-[15px] leading-[2.0] text-stone-700">
-          {paragraph.split('\n').map((line, lIdx) => (
-            <React.Fragment key={lIdx}>
-              {line}
-              {lIdx !== paragraph.split('\n').length - 1 && <br />}
-            </React.Fragment>
-          ))}
-        </div>
-      ))}
+    <div className={`space-y-1 ${className}`}>
+      {lines.map((line, idx) => {
+        if (line.type === 'empty') return <div key={idx} className="h-3"/>;
+        if (line.type === 'heading') return (
+          <p key={idx} className="text-[15px] font-bold text-stone-800 pt-3 pb-1 leading-[1.8]">
+            {line.content}
+          </p>
+        );
+        if (line.type === 'bullet') return (
+          <p key={idx} className="text-[15px] leading-[2.0] text-stone-700 pl-3 flex gap-2">
+            <span className="text-orange-400 flex-shrink-0 mt-1">・</span>
+            <span>{line.content}</span>
+          </p>
+        );
+        return (
+          <p key={idx} className="text-[15px] leading-[2.0] text-stone-700">
+            {line.content}
+          </p>
+        );
+      })}
     </div>
   );
 };
@@ -632,6 +702,7 @@ function App() {
 6️⃣ ラッキー要素 🍀（カラー・ナンバー・フード）
 
 【スタイル厳守】
+・マークダウン記号（# ## ### * ** *** - など）は一切使わない
 ・絵文字を適度に使用
 ・1文は短め（全角18〜25文字目安）、改行は基本一文ごと
 ・項目変わり目に必ず空行
