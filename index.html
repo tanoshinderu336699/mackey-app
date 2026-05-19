@@ -1293,6 +1293,26 @@ ${avoidSet[2]}
 
   const AudioPlayer = () => {
     if (!audioUrl) return null;
+
+    // URL自動変換（Google Drive・Dropboxなどを直接再生できる形式に変換）
+    const getPlayableUrl = (url) => {
+      if (!url) return '';
+      // base64データはそのまま
+      if (url.startsWith('data:')) return url;
+      // Google Drive: /file/d/ID/view → /uc?export=download&id=ID
+      const gdMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+      if (gdMatch) return `https://drive.google.com/uc?export=download&id=${gdMatch[1]}`;
+      // Google Drive open形式: id=ID
+      const gdOpenMatch = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+      if (gdOpenMatch) return `https://drive.google.com/uc?export=download&id=${gdOpenMatch[1]}`;
+      // Dropbox: ?dl=0 → ?dl=1 / ?raw=0 → ?raw=1
+      if (url.includes('dropbox.com')) return url.replace('dl=0', 'dl=1').replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=1', '');
+      // その他はそのまま
+      return url;
+    };
+
+    const playableUrl = getPlayableUrl(audioUrl);
+
     return (
       <div className="bg-white/90 backdrop-blur rounded-3xl shadow-lg border-2 border-orange-200 p-4 mb-4 relative overflow-hidden">
         <div className="absolute -top-2 -right-2 w-20 h-20 bg-gradient-to-br from-orange-200 to-pink-200 rounded-full opacity-40"></div>
@@ -1309,7 +1329,14 @@ ${avoidSet[2]}
             <p className="text-xs text-stone-500 mt-0.5">{profile.name}からの肉声メッセージ 🎙️</p>
           </div>
         </div>
-        <audio ref={audioRef} src={audioUrl} onEnded={() => setIsPlaying(false)} onPause={() => setIsPlaying(false)} onPlay={() => setIsPlaying(true)} className="hidden"/>
+        <audio ref={audioRef} src={playableUrl}
+          onEnded={() => setIsPlaying(false)}
+          onPause={() => setIsPlaying(false)}
+          onPlay={() => setIsPlaying(true)}
+          onError={() => {
+            setIsPlaying(false);
+          }}
+          className="hidden"/>
       </div>
     );
   };
@@ -1832,24 +1859,71 @@ ${avoidSet[2]}
                   className="w-full p-3 border-2 border-orange-100 rounded-2xl bg-white outline-none focus:border-orange-300 mb-3"
                   placeholder="音声タイトル（例：今週のマッキーからのメッセージ）"/>
 
+                {/* ファイルアップロード（base64変換してSupabaseに保存） */}
                 <div className="mb-3 bg-white/70 rounded-xl p-3 border border-orange-200">
-                  <p className="text-xs font-bold text-stone-700 mb-1.5">🔗 音声URL（全端末に反映）</p>
+                  <p className="text-xs font-bold text-stone-700 mb-1">🎵 音声ファイルをアップロード</p>
+                  <p className="text-[10px] text-stone-400 mb-2">MP3・WAV・AAC・M4A・FLAC・OGG・OPUS 対応</p>
+                  <input
+                    type="file"
+                    accept="audio/*,.mp3,.wav,.aac,.m4a,.flac,.ogg,.opus,.wma"
+                    onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (!file) return;
+                      const maxMB = 4;
+                      if (file.size > maxMB * 1024 * 1024) {
+                        alert(`ファイルサイズが大きすぎます。${maxMB}MB以下にしてください 🙏\n\n圧縮方法：\n・MP3に変換して保存\n・ビットレートを128kbps以下に設定`);
+                        return;
+                      }
+                      const reader = new FileReader();
+                      reader.onload = async (ev) => {
+                        const base64 = ev.target.result; // data:audio/mp3;base64,...
+                        setAudioUrl(base64);
+                        // Supabaseに保存
+                        const ok = await saveSettingToSupabase('audio_url', base64);
+                        await saveSettingToSupabase('audio_title', audioTitle);
+                        if (ok) {
+                          alert('音声ファイルを保存しました ✨\n全端末に反映されます！');
+                        } else {
+                          alert('ファイルが大きすぎて保存できませんでした 🙏\nURLを使う方法をお試しください。');
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                    className="text-xs w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-amber-100 file:text-amber-700 file:font-bold file:cursor-pointer"
+                  />
+                  <p className="text-[10px] text-stone-400 mt-1.5 leading-relaxed">
+                    ※ 4MB以下のファイルが対象です。MP3（128kbps）推奨
+                  </p>
+                </div>
+
+                {/* URLで入力 */}
+                <div className="mb-3 bg-white/70 rounded-xl p-3 border border-orange-200">
+                  <p className="text-xs font-bold text-stone-700 mb-1">🔗 または音声URLを入力</p>
                   <p className="text-[10px] text-stone-400 mb-2 leading-relaxed">
-                    Google Drive・Dropboxなどで音声ファイルを共有して、そのURLを貼り付けてください。
+                    Google Drive・Dropbox・SoundCloudなどのURLをそのまま貼り付けてOK。自動変換します。
                   </p>
                   <input
                     type="url"
-                    value={audioUrl}
+                    value={audioUrl && audioUrl.startsWith('data:') ? '' : audioUrl}
                     onChange={(e) => setAudioUrl(e.target.value)}
                     className="w-full p-2.5 border-2 border-orange-200 rounded-xl outline-none focus:border-orange-400 text-sm"
-                    placeholder="https://drive.google.com/..."
+                    placeholder="https://drive.google.com/file/d/..."
                   />
-                  {audioUrl && (
-                    <p className="text-[10px] text-emerald-600 mt-1.5 font-bold">✅ URLが設定されています</p>
+                  {audioUrl && !audioUrl.startsWith('data:') && (
+                    <p className="text-[10px] text-emerald-600 mt-1.5 font-bold">✅ URLが入力されています</p>
+                  )}
+                  {audioUrl && audioUrl.startsWith('data:') && (
+                    <p className="text-[10px] text-emerald-600 mt-1.5 font-bold">✅ ファイルがアップロード済みです</p>
                   )}
                 </div>
 
                 <button onClick={async () => {
+                  if (!audioUrl || audioUrl.startsWith('data:')) {
+                    // ファイルアップロードは上のonChangeで既に保存済み
+                    alert('タイトルを保存しました ✨');
+                    await saveSettingToSupabase('audio_title', audioTitle);
+                    return;
+                  }
                   await saveSettingToSupabase('audio_url', audioUrl);
                   await saveSettingToSupabase('audio_title', audioTitle);
                   alert('音声設定を保存しました ✨\n全端末に反映されます！');
@@ -1857,6 +1931,17 @@ ${avoidSet[2]}
                   style={{background: 'linear-gradient(135deg, #fb923c, #f59e0b)'}}>
                   💾 音声設定を全端末に保存
                 </button>
+
+                {audioUrl && (
+                  <button onClick={async () => {
+                    if (confirm('音声設定をクリアしますか？')) {
+                      setAudioUrl('');
+                      await saveSettingToSupabase('audio_url', '');
+                    }
+                  }} className="w-full py-2 rounded-xl text-stone-400 text-xs mt-2 hover:text-red-500">
+                    🗑️ 音声をクリア
+                  </button>
+                )}
               </div>
 
               {/* ==================== 動画設定 ==================== */}
