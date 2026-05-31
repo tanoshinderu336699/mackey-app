@@ -781,12 +781,17 @@ function App() {
   const [profileDraft, setProfileDraft] = useState(getProfile);
   const [profileSaved, setProfileSaved] = useState(false);
 
-  const [birthYear, setBirthYear] = useState('');
-  const [birthMonth, setBirthMonth] = useState('');
-  const [birthDay, setBirthDay] = useState('');
-  const [birthTimeHour, setBirthTimeHour] = useState('');
-  const [birthTimeMinute, setBirthTimeMinute] = useState('');
-  const [birthPlace, setBirthPlace] = useState('');
+  // 出生情報は前回入力した内容を記憶（そのブラウザのみ）
+  const savedBirth = (() => {
+    try { return JSON.parse(localStorage.getItem('mackey-birth-info') || '{}'); }
+    catch(e) { return {}; }
+  })();
+  const [birthYear, setBirthYear] = useState(savedBirth.birthYear || '');
+  const [birthMonth, setBirthMonth] = useState(savedBirth.birthMonth || '');
+  const [birthDay, setBirthDay] = useState(savedBirth.birthDay || '');
+  const [birthTimeHour, setBirthTimeHour] = useState(savedBirth.birthTimeHour || '');
+  const [birthTimeMinute, setBirthTimeMinute] = useState(savedBirth.birthTimeMinute || '');
+  const [birthPlace, setBirthPlace] = useState(savedBirth.birthPlace || '');
 
   const [qEnergy, setQEnergy] = useState('');
   const [qPath, setQPath] = useState('');
@@ -816,6 +821,15 @@ function App() {
   useEffect(() => {
     if (dynamicApiKey) setApiKeyInput(dynamicApiKey);
   }, [dynamicApiKey]);
+
+  // 出生情報が変わるたびに記憶（次回から自動入力される）
+  useEffect(() => {
+    try {
+      localStorage.setItem('mackey-birth-info', JSON.stringify({
+        birthYear, birthMonth, birthDay, birthTimeHour, birthTimeMinute, birthPlace
+      }));
+    } catch(e) {}
+  }, [birthYear, birthMonth, birthDay, birthTimeHour, birthTimeMinute, birthPlace]);
 
   // MackeyImageのラッパー（dynamicImagesを自動で渡す）
   const MI = ({ which, className, alt }) => (
@@ -923,8 +937,7 @@ function App() {
   };
   const handleLogout = () => {
     setScreen('login'); setPassword(''); setAdminPassword('');
-    setBirthYear(''); setBirthMonth(''); setBirthDay('');
-    setBirthTimeHour(''); setBirthTimeMinute(''); setBirthPlace('');
+    // 出生情報は記憶を保持（次回も自動入力されるようにあえて消さない）
     setQEnergy(''); setQPath(''); setQMind('');
     setReadingData(null); setDetailModal(null);
   };
@@ -2038,7 +2051,29 @@ ${avoidSet[2]}
               </div>
             </div>
             <h2 className="text-lg font-bold text-center text-stone-800 mb-1">あなたの旅のはじまり 🗺️</h2>
-            <p className="text-center text-stone-500 text-xs mb-5">深く星を読むため、教えてくださいね ✨</p>
+            <p className="text-center text-stone-500 text-xs mb-3">深く星を読むため、教えてくださいね ✨</p>
+
+            {(birthYear || birthMonth || birthDay) && (
+              <div className="mb-4 p-3 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center justify-between gap-2">
+                <p className="text-[11px] text-emerald-700 leading-relaxed flex-1">
+                  ✅ 前回の情報を覚えてるよ！<br/>
+                  そのまま進んでOK。変えたい時は下のボタンで消せるよ 😊
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm('入力した情報を消去しますか？')) {
+                      setBirthYear(''); setBirthMonth(''); setBirthDay('');
+                      setBirthTimeHour(''); setBirthTimeMinute(''); setBirthPlace('');
+                      try { localStorage.removeItem('mackey-birth-info'); } catch(e) {}
+                    }
+                  }}
+                  className="text-[10px] text-stone-500 hover:text-red-500 bg-white border border-stone-200 rounded-full px-3 py-2 font-bold whitespace-nowrap flex-shrink-0">
+                  🗑️ 消去
+                </button>
+              </div>
+            )}
+
             <form onSubmit={handleProceedToQuestions} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-orange-600 mb-1.5 ml-1">📅 生年月日</label>
