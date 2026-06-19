@@ -840,41 +840,35 @@ function App() {
   const ADMIN_PASSWORD = 'admin-mackey';
 
   useEffect(() => {
-    // アプリ起動時にSupabaseから設定を読み込む
+    // アプリ起動時にSupabaseから設定を読み込む（失敗してもアプリは動く）
     const loadSettings = async () => {
-      const settings = await loadSettingsFromSupabase();
+      try {
+        const settings = await loadSettingsFromSupabase();
+        if (!settings) return;
 
-      // プロフィール
-      if (settings.profile && settings.profile !== '{}') {
-        try {
-          const p = JSON.parse(settings.profile);
-          if (Object.keys(p).length > 0) {
-            const merged = { ...DEFAULT_PROFILE, ...p };
-            setProfile(merged);
-            setProfileDraft(merged);
-          }
-        } catch(e) {}
+        if (settings.profile && settings.profile !== '{}') {
+          try {
+            const p = JSON.parse(settings.profile);
+            if (p && Object.keys(p).length > 0) {
+              const merged = { ...DEFAULT_PROFILE, ...p };
+              setProfile(merged);
+              setProfileDraft(merged);
+            }
+          } catch(e) {}
+        }
+        if (settings.audio_url) setAudioUrl(settings.audio_url);
+        if (settings.audio_title) setAudioTitle(settings.audio_title);
+        if (settings.video_url) setVideoUrl(settings.video_url);
+        if (settings.video_title) setVideoTitle(settings.video_title);
+        if (settings.hitokoto_title) setHitokotoTitle(settings.hitokoto_title);
+        if (settings.hitokoto_body) setHitokotoBody(settings.hitokoto_body);
+        if (settings.image_1) setDynamicImages(prev => ({ ...prev, '1': settings.image_1 }));
+        if (settings.image_2) setDynamicImages(prev => ({ ...prev, '2': settings.image_2 }));
+        if (settings.image_3) setDynamicImages(prev => ({ ...prev, '3': settings.image_3 }));
+        if (settings.gemini_api_key) setDynamicApiKey(settings.gemini_api_key);
+      } catch(e) {
+        console.error('設定の読み込みに失敗しましたが、アプリは正常に動作します:', e);
       }
-
-      // 音声
-      if (settings.audio_url) setAudioUrl(settings.audio_url);
-      if (settings.audio_title) setAudioTitle(settings.audio_title);
-
-      // 動画
-      if (settings.video_url) setVideoUrl(settings.video_url);
-      if (settings.video_title) setVideoTitle(settings.video_title);
-
-      // マッキーから一言
-      if (settings.hitokoto_title) setHitokotoTitle(settings.hitokoto_title);
-      if (settings.hitokoto_body) setHitokotoBody(settings.hitokoto_body);
-
-      // 画像（Supabaseに保存されていればそちらを優先）
-      if (settings.image_1) setDynamicImages(prev => ({ ...prev, '1': settings.image_1 }));
-      if (settings.image_2) setDynamicImages(prev => ({ ...prev, '2': settings.image_2 }));
-      if (settings.image_3) setDynamicImages(prev => ({ ...prev, '3': settings.image_3 }));
-
-      // APIキー（Supabaseに保存されていればそちらを優先）
-      if (settings.gemini_api_key) setDynamicApiKey(settings.gemini_api_key);
     };
     loadSettings();
   }, []);
