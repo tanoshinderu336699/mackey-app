@@ -1335,27 +1335,6 @@ ${avoidSet[2]}
     }
   };
 
-  const exportStandaloneHTML = async () => {
-    const img1 = localStorage.getItem('mackey-image-1');
-    const img2 = localStorage.getItem('mackey-image-2');
-    const img3 = localStorage.getItem('mackey-image-3');
-    if (!img1 || !img2 || !img3) { alert('画像が3枚揃っていません。先に3枚すべてアップロードしてください 🙏'); return; }
-    try {
-      const response = await fetch(window.location.href);
-      const html = await response.text();
-      const embedScript = `<script>window.__embeddedMackeyImages = ${JSON.stringify({ '1': img1, '2': img2, '3': img3 })};<\/script>`;
-      const modified = html.replace('</head>', `${embedScript}\n</head>`);
-      const blob = new Blob([modified], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `MackeyJourneyMessage-Shared-${new Date().toISOString().slice(0, 10)}.html`;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      alert('共有用HTMLをダウンロードしました ✨');
-    } catch (e) { alert('生成エラー: ' + e.message); }
-  };
-
   const getStoredMackeyImage = (which) => {
     if (typeof localStorage === 'undefined') return null;
     return localStorage.getItem(`mackey-image-${which}`);
@@ -1843,21 +1822,6 @@ ${avoidSet[2]}
               </div>
 
               {/* ==================== エクスポート ==================== */}
-              <div className="p-4 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border-2 border-emerald-300">
-                <label className="text-sm font-bold mb-2 flex items-center gap-2 text-stone-700">
-                  <Plane size={16} className="text-emerald-600"/> クライアント共有用にエクスポート
-                </label>
-                <p className="text-[11px] text-stone-600 leading-[1.7] mb-3">
-                  💡 画像が埋め込まれた単体HTMLファイルをダウンロードします。
-                  クライアントに送るだけで画像付きで開けます ✨
-                </p>
-                <button onClick={exportStandaloneHTML}
-                  className="w-full py-2.5 rounded-xl font-bold text-white text-sm shadow-md flex items-center justify-center gap-2"
-                  style={{background: 'linear-gradient(135deg, #10b981, #14b8a6)'}}>
-                  <Plane size={16}/> 共有用HTMLをダウンロード
-                </button>
-              </div>
-
               {/* ==================== マッキーから一言 ==================== */}
               <div className="p-4 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-2xl border-2 border-amber-300">
                 <label className="text-sm font-bold mb-1 flex items-center gap-2 text-stone-700">
